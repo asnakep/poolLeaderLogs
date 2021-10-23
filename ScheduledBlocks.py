@@ -1,6 +1,4 @@
 #!/bin/env python3
-import logging
-from logging.handlers import TimedRotatingFileHandler
 import requests
 import math
 import binascii
@@ -19,6 +17,14 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.engine.create import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
+#################################
+######### configuration #########
+#################################
+BASE_DIR = path.dirname(path.abspath(__file__))
+CONFIGPATH = path.join(BASE_DIR, "config.yaml")
+with open(CONFIGPATH) as f:
+    CONFIG = yaml.load(f, Loader=yaml.FullLoader)
+
 ##################################
 ######### setup slots db #########
 ##################################
@@ -35,32 +41,12 @@ class Slots(Base):
 Base.metadata.create_all(engine)
 
 ##################################
-######### setup logging ##########
-##################################
-formatter = logging.Formatter(f"%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s")
-handler = TimedRotatingFileHandler(CONFIG["log_path"], when="midnight", backupCount=10)
-handler.setFormatter(formatter)
-logger = logging.getLogger(__name__)
-logger.addHandler(handler)
-logger.setLevel(logging.DEBUG)
-
-
-##################################
 ######### main routines ##########
 ##################################
 class col:
     green = '\033[92m'
     endcl = '\033[0m'
     bold = '\033[1m'
-
-# open config file
-BASE_DIR = path.dirname(path.abspath(__file__))
-CONFIGPATH = path.join(BASE_DIR, "config.yaml")
-
-##### LOAD CONFIGURATION #####
-with open(CONFIGPATH) as f:
-    CONFIG = yaml.load(f, Loader=yaml.FullLoader)
-
 
 ### Set your own timezone, default is Europe/Berlin ---------------###
 local_tz = pytz.timezone(CONFIG["timezone"])
@@ -229,11 +215,14 @@ if __name__ == "__main__":
         print(col.bold + "No SlotLeader Schedules Found for Current Epoch " +str(epoch))
         quit()
 
-    newSlots = Slots(
-                epoch = epoch,
-                slot_qty = slotcount,
-                slots = str(slots)
-            )
-
-    session.merge(newSlots)
-    session.commit()
+    # save to SQLite database
+    try: 
+        newSlots = Slots(
+                    epoch = epoch,
+                    slot_qty = slotcount,
+                    slots = str(slots)
+                )
+        session.merge(newSlots)
+        session.commit()
+    except Exception as ex:
+        print(ex)
