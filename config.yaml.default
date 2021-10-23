@@ -1,0 +1,5 @@
+timezone = "Europe/Berlin"
+blockfrost_id:
+pool_id:
+pool_ticker:
+vrf_key: "/path_to_file/vrf.skey"

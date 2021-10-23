@@ -6,26 +6,58 @@ import math
 import binascii
 import json
 import pytz
+from sqlalchemy.sql.sqltypes import BigInteger
+import yaml
 import hashlib
-import re
 from ctypes import *
+from decimal import *
 from os import path
-from datetime import datetime, timezone
+from datetime import datetime
 from sys import exit, platform
+from sqlalchemy import Column
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.engine.create import create_engine
+from sqlalchemy.orm import scoped_session, sessionmaker
+
+
+
+##################################
+######### setup slots db #########
+##################################
+Base = declarative_base()
+engine = create_engine("sqlite:///scheduledblocks.db")
+session = scoped_session(sessionmaker(autocommit=False,bind=engine))
+
+class Slots(Base):
+    epoch = Column(BigInteger, primary_key=True)
+    slot_qty = Column(BigInteger)
+    slots = Column(BigInteger)
+
+Base.metadata.create_all(engine)
+##################################
 
 class col:
     green = '\033[92m'
     endcl = '\033[0m'
     bold = '\033[1m'
 
+# open config file
+BASE_DIR = path.dirname(path.abspath(__file__))
+CONFIGPATH = path.join(BASE_DIR, "config.yaml")
+
+##### LOAD CONFIGURATION #####
+with open(CONFIGPATH) as f:
+    CONFIG = yaml.load(f, Loader=yaml.FullLoader)
+
+
 ### Set your own timezone, default is Europe/Berlin ---------------###
-local_tz = pytz.timezone('Europe/Berlin')
+local_tz = pytz.timezone(CONFIG["timezone"])
 
 ### Set These Variables ###
-BlockFrostId = ""
-PoolId = ""
-PoolTicker = ""
-VrfKeyFile = ('/path_to_file/vrf.skey')
+BlockFrostId = CONFIG["blockfrost_id"]
+PoolId = CONFIG["pool_id"]
+PoolTicker = CONFIG["pool_ticker"]
+VrfKeyFile = CONFIG["vrf_key"]
 ### -------------------------------------------------------------- ###
 
 ### ADA Unicode symbol and Lovelaces removal ###
@@ -53,21 +85,6 @@ poolStakeParam = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/pool
 json_data = poolStakeParam.json()
 pStake = int(poolStakeParam.json().get("active_stake")) / lovelaces
 pStake = "{:,}".format(pStake)
-
-print()
-print(col.bold + f'Checking SlotLeader Schedules for Stakepool: ' + (col.green + PoolTicker + col.endcl))
-print()
-print(col.bold + f'Pool Id: ' + (col.green + PoolId + col.endcl))
-print()
-print(col.bold + f'Current Epoch: ' + col.green + str(epoch) + col.endcl)
-print()
-print(col.bold + f'Nonce: ' + col.green + str(eta0) + col.endcl)
-print()
-print(col.bold + f'Network Active Stake: ' + col.green + str(nStake) + col.endcl + col.bold + ada + col.endcl)
-print()
-print(col.bold + f'Pool Active Stake: ' + col.green + str(pStake) + col.endcl + col.bold + ada + col.endcl)
-print()
-
 
 ### Slots Leader Computation ###
 
@@ -111,10 +128,10 @@ firstSlot = firstShelleySlot.json().get("slot")
 ### calculate first slot of target epoch ###
 firstSlotOfEpoch = (firstSlot) + (epoch - 211)*epochLength
 
-from decimal import *
 getcontext().prec = 9
 getcontext().rounding = ROUND_HALF_UP
 
+# mkseed
 def mkSeed(slot,eta0):
 
     h = hashlib.blake2b(digest_size=32)
@@ -126,9 +143,9 @@ def mkSeed(slot,eta0):
     slotToSeedBytes = h.digest()
 
     seed = [x ^ slotToSeedBytes[i] for i,x in enumerate(seedLbytes)]
-
     return bytes(seed)
 
+# eval certified
 def vrfEvalCertified(seed, tpraosCanBeLeaderSignKeyVRF):
     if isinstance(seed, bytes) and isinstance(tpraosCanBeLeaderSignKeyVRF, bytes):
         proof = create_string_buffer(libsodium.crypto_vrf_ietfdraft03_proofbytes())
@@ -165,20 +182,44 @@ def isSlotLeader(slot,activeSlotCoeff,sigma,eta0,poolVrfSkey):
     return q <= sigmaOfF
 
 
-slotcount=0
+# execute when running from commandline
+if __name__ == "__main__":
+    print()
+    print(col.bold + f'Checking SlotLeader Schedules for Stakepool: ' + (col.green + PoolTicker + col.endcl))
+    print()
+    print(col.bold + f'Pool Id: ' + (col.green + PoolId + col.endcl))
+    print()
+    print(col.bold + f'Current Epoch: ' + col.green + str(epoch) + col.endcl)
+    print()
+    print(col.bold + f'Nonce: ' + col.green + str(eta0) + col.endcl)
+    print()
+    print(col.bold + f'Network Active Stake: ' + col.green + str(nStake) + col.endcl + col.bold + ada + col.endcl)
+    print()
+    print(col.bold + f'Pool Active Stake: ' + col.green + str(pStake) + col.endcl + col.bold + ada + col.endcl)
+    print()
 
-for slot in range(firstSlotOfEpoch,epochLength+firstSlotOfEpoch):
+    slotcount=0
+    slots = []
 
-    slotLeader = isSlotLeader(slot, activeSlotCoeff, sigma, eta0, poolVrfSkey)
+    for slot in range(firstSlotOfEpoch,epochLength+firstSlotOfEpoch):
 
-    if slotLeader:
-        timestamp = datetime.fromtimestamp(slot + 1591566291, tz=local_tz)
+        slotLeader = isSlotLeader(slot, activeSlotCoeff, sigma, eta0, poolVrfSkey)
 
-        slotcount+=1
-        print(col.bold + "Leader At Slot: "  + str(slot-firstSlotOfEpoch) + " - Local Time " + str(timestamp.strftime('%Y-%m-%d %H:%M:%S') + " - Scheduled Epoch Blocks: " + str(slotcount)))
+        if slotLeader:
+            timestamp = datetime.fromtimestamp(slot + 1591566291, tz=local_tz)
+            slots.append(slot)
+            slotcount+=1
+            print(col.bold + "Leader At Slot: "  + str(slot-firstSlotOfEpoch) + " - Local Time " + str(timestamp.strftime('%Y-%m-%d %H:%M:%S') + " - Scheduled Epoch Blocks: " + str(slotcount)))
 
+    if slotcount == 0:
+        print(col.bold + "No SlotLeader Schedules Found for Current Epoch " +str(epoch))
+        quit()
 
-if slotcount == 0:
-    print(col.bold + "No SlotLeader Schedules Found for Current Epoch " +str(epoch))
-    quit()
+    newSlots = Slots(
+                epoch = epoch,
+                slot_qty = slotcount,
+                slots = slots
+            )
 
+    session.merge(newSlots)
+    session.commit()
