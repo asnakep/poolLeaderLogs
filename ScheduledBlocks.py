@@ -1,7 +1,7 @@
 #!/bin/env python3
-
+import logging
+from logging.handlers import TimedRotatingFileHandler
 import requests
-import urllib.request
 import math
 import binascii
 import json
@@ -23,7 +23,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 ######### setup slots db #########
 ##################################
 Base = declarative_base()
-engine = create_engine("sqlite:////ScheduledBlocks.db")
+engine = create_engine("sqlite:///slotschedule.db")
 session = scoped_session(sessionmaker(autocommit=False,bind=engine))
 
 class Slots(Base):
@@ -33,8 +33,21 @@ class Slots(Base):
     slots = Column(BigInteger)
 
 Base.metadata.create_all(engine)
-##################################
 
+##################################
+######### setup logging ##########
+##################################
+formatter = logging.Formatter(f"%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s")
+handler = TimedRotatingFileHandler(CONFIG["log_path"], when="midnight", backupCount=10)
+handler.setFormatter(formatter)
+logger = logging.getLogger(__name__)
+logger.addHandler(handler)
+logger.setLevel(logging.DEBUG)
+
+
+##################################
+######### main routines ##########
+##################################
 class col:
     green = '\033[92m'
     endcl = '\033[0m'
@@ -181,7 +194,9 @@ def isSlotLeader(slot,activeSlotCoeff,sigma,eta0,poolVrfSkey):
     return q <= sigmaOfF
 
 
-# execute when running from commandline
+####################################
+######### main shell exec ##########
+####################################
 if __name__ == "__main__":
     print()
     print(col.bold + f'Checking SlotLeader Schedules for Stakepool: ' + (col.green + PoolTicker + col.endcl))
