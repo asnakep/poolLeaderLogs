@@ -176,7 +176,7 @@ for slot in range(firstSlotOfEpoch,epochLength+firstSlotOfEpoch):
 
         slotcount+=1
         print(col.bold + "Leader At Slot: "  + str(slot-firstSlotOfEpoch) + " - Local Time " + str(timestamp.strftime('%Y-%m-%d %H:%M:%S') + " - Scheduled Epoch Blocks: " + str(slotcount)))
-        quit()
+
 
 if slotcount == 0:
     print(col.bold + "No SlotLeader Schedules Found for Current Epoch " +str(epoch))
