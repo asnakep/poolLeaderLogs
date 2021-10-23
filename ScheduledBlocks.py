@@ -23,7 +23,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 ######### setup slots db #########
 ##################################
 Base = declarative_base()
-engine = create_engine("sqlite:///ScheduledBlocks.db")
+engine = create_engine("sqlite:////ScheduledBlocks.db")
 session = scoped_session(sessionmaker(autocommit=False,bind=engine))
 
 class Slots(Base):
