@@ -19,16 +19,15 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.engine.create import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-
-
 ##################################
 ######### setup slots db #########
 ##################################
 Base = declarative_base()
-engine = create_engine("sqlite:///scheduledblocks.db")
+engine = create_engine("sqlite:///ScheduledBlocks.db")
 session = scoped_session(sessionmaker(autocommit=False,bind=engine))
 
 class Slots(Base):
+    __tablename__ = "slots"
     epoch = Column(BigInteger, primary_key=True)
     slot_qty = Column(BigInteger)
     slots = Column(BigInteger)
@@ -218,7 +217,7 @@ if __name__ == "__main__":
     newSlots = Slots(
                 epoch = epoch,
                 slot_qty = slotcount,
-                slots = slots
+                slots = str(slots)
             )
 
     session.merge(newSlots)

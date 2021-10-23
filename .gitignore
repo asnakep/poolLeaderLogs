@@ -39,3 +39,5 @@ pooldataenv
 launch.json
 settings.json
 *.db
+*.vkey
+*.skey
