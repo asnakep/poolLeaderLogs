@@ -27,3 +27,5 @@ VrfKeyFile = ('/path_to_file/vrf.skey')
 Usage:
 
 python3 ScheduledBlocks.py
+
+Note: please if you get script error for module not found, install it with: pip install <module_name>
