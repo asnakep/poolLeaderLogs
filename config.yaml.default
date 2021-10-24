@@ -1,0 +1,5 @@
+timezone: "Europe/Berlin"
+blockfrost_id: "mainnetYOURBLOCKFROSTID"
+pool_id: "yourpool"
+pool_ticker: "TICKER"
+vrf_key: "/path_to_file/vrf.skey"
