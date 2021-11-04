@@ -1,0 +1,18 @@
+blockfrost-python==0.3.0
+Brotli @ file:///build/source/dist/Brotli-1.0.9-cp39-cp39-linux_x86_64.whl
+certifi @ file:///build/source/dist/certifi-2021.5.30-py2.py3-none-any.whl
+chardet @ file:///build/chardet-4.0.0/dist/chardet-4.0.0-py2.py3-none-any.whl
+charset-normalizer==2.0.7
+greenlet==1.1.2
+idna==3.3
+pyaml==21.10.1
+PySocks @ file:///build/PySocks-1.7.1/dist/PySocks-1.7.1-py3-none-any.whl
+pytz @ file:///build/pytz-2021.1/dist/pytz-2021.1-py3-none-any.whl
+PyYAML @ file:///build/PyYAML-5.4.1/dist/PyYAML-5.4.1-cp39-cp39-linux_x86_64.whl
+requests @ file:///build/requests-2.25.1/dist/requests-2.25.1-py2.py3-none-any.whl
+requests-mock==1.9.3
+six @ file:///build/six-1.15.0/dist/six-1.15.0-py2.py3-none-any.whl
+SQLAlchemy @ file:///build/SQLAlchemy-1.3.23/dist/SQLAlchemy-1.3.23-cp39-cp39-linux_x86_64.whl
+SQLAlchemy-Utils @ file:///build/SQLAlchemy-Utils-0.36.6/dist/SQLAlchemy_Utils-0.36.6-py2.py3-none-any.whl
+urllib3==1.26.7
+yamlloader @ file:///build/yamlloader-1.0.0/dist/yamlloader-1.0.0-py3-none-any.whl
