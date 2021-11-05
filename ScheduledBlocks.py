@@ -95,7 +95,7 @@ if(key == 'N'):
   exit()
 
  if ErrorMsg not in eta0 :
-  print(f'New Epoch Nonce: '+str(eta0))
+  print(col.bold + f'New Epoch Nonce: ' + col.green + str(eta0) + col.endcl)
 
  netStakeParam = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/epochs/"+(str(epoch-1)), headers=headers)
  json_data = netStakeParam.json()
@@ -165,8 +165,6 @@ if(key == 'E'):
  print(col.bold + f'Pool Id: ' + (col.green + PoolId + col.endcl))
  print()
  print(col.bold + f'Epoch: ' + col.green + Epoch + col.endcl)
- print()
- print(col.bold + f'Nonce: ' + col.green + str(eta0) + col.endcl)
  print()
  print(col.bold + f'Network Active Stake in Epoch ' + Epoch + ": " + col.green + str(nStake) + col.endcl + col.bold + ada + col.endcl)
  print()
