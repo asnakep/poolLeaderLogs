@@ -24,10 +24,10 @@ class col:
 local_tz = pytz.timezone('Europe/Berlin')
 
 ### Set These Variables ###
-BlockFrostId = "jsLX87IunMrsi3BsHenNlKHecq4CxlhJ"
-PoolId = "342350284fd76ba9dbd7fd4ed579b2a2058d5ee558f8872b37817b28"
-PoolTicker = "SNAKE"
-VrfKeyFile = ('/home/nodo/.SlotLeader/vrf/vrf.skey')
+BlockFrostId = ""
+PoolId = ""
+PoolTicker = ""
+VrfKeyFile = ('<path_to>/vrf.skey')
 ### -------------------------------------------------------------- ###
 
 
