@@ -37,11 +37,11 @@ lovelaces = 1000000
 
 ### Get Current Epoch from Armada Alliance ###
 headers_armada ={'content-type': 'application/json'}
-CepochParam = requests.get("https://nonce.armada-alliance.com/current", headers=headers_armada)
+CepochParam = requests.get("https://nonce.armada-alliance.io/current", headers=headers_armada)
 json_data = CepochParam.json()
 Cepoch = CepochParam.json().get("epoch")
 
-NepochParam = requests.get("https://nonce.armada-alliance.com/next", headers=headers_armada)
+NepochParam = requests.get("https://nonce.armada-alliance.io/next", headers=headers_armada)
 json_data = NepochParam.json()
 Nepoch = NepochParam.json().get("epoch")
 Neta0 = NepochParam.json().get("nonce")
@@ -83,7 +83,7 @@ if(key == 'N'):
  headers = {'content-type': 'application/json', 'project_id': BlockFrostId}
  headers_armada ={'content-type': 'application/json'}
 
- epochParam = requests.get("https://nonce.armada-alliance.com/next", headers=headers_armada)
+ epochParam = requests.get("https://nonce.armada-alliance.io/next", headers=headers_armada)
  json_data = epochParam.json()
  epoch = epochParam.json().get("epoch")
  eta0 = epochParam.json().get("nonce")
