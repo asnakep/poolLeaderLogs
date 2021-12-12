@@ -20,7 +20,7 @@ class col:
     endcl = '\033[0m'
     bold = '\033[1m'
 
-### Set your own timezone -----------------------------------------###
+### Set your onw timezone -----------------------------------------###
 local_tz = pytz.timezone('Europe/Berlin')
 
 ### Set These Variables ###
@@ -41,6 +41,7 @@ CepochParam = requests.get("https://nonce.armada-alliance.io/current", headers=h
 json_data = CepochParam.json()
 Cepoch = CepochParam.json().get("epoch")
 
+### Get Current Epoch Nonce from Armada Alliance ###
 NepochParam = requests.get("https://nonce.armada-alliance.io/next", headers=headers_armada)
 json_data = NepochParam.json()
 Nepoch = NepochParam.json().get("epoch")
@@ -65,9 +66,11 @@ print(col.endcl)
 print()
 print(col.bold + f'(N) to check Next Epoch Schedules ' +str(msg))
 print(col.endcl)
-print(col.bold + f'(E) to Check in Current or Previous Epochs')
-print()
-print(f'(X) to Exit')
+print(col.bold + f'(C) to Check Current Epoch')
+print(col.endcl)
+print(col.bold + f'(P) to Check Previous Epochs')
+print(col.endcl)
+print(col.bold + f'(X) to Exit')
 print(col.endcl)
 
 ### Read Keyboard keys ###
@@ -111,6 +114,7 @@ if(key == 'N'):
  json_data = poolSigma.json()
  sigma = poolSigma.json().get("active_size")
 
+
  print()
  print(col.bold + f'Checking SlotLeader Schedules for Stakepool: ' + (col.green + PoolTicker + col.endcl))
  print()
@@ -118,18 +122,16 @@ if(key == 'N'):
  print()
  print(col.bold + f'Next Epoch: ' + col.green + str(epoch) + col.endcl)
  print()
- print(col.bold + f'New Nonce: ' + col.green + str(eta0) + col.endcl)
- print()
  print(col.bold + f'Network Active Stake in Epoch ' + str(epoch-1) + ": " + col.green + str(nStake) + col.endcl + col.bold + ada + col.endcl)
  print()
  print(col.bold + f'Pool Active Stake in Epoch ' + str(epoch-1) + ": " + col.green + str(pStake) + col.endcl + col.bold + ada + col.endcl)
  print()
 
 
-if(key == 'E'):
+if(key == 'P'):
 
  print()
- Epoch = input(col.bold + "Enter Epoch Number (Previous or Current): " + col.green)
+ Epoch = input(col.bold + "Enter Epoch Previous Number: " + col.green)
  print(col.endcl)
 
 ### Get data from blockfrost.io APIs ###
@@ -159,17 +161,57 @@ if(key == 'E'):
    pStake = int(pStake) / lovelaces
    pStake = "{:,}".format(pStake)
 
-
  print(col.bold + f'Checking SlotLeader Schedules for Stakepool: ' + (col.green + PoolTicker + col.endcl))
  print()
  print(col.bold + f'Pool Id: ' + (col.green + PoolId + col.endcl))
  print()
  print(col.bold + f'Epoch: ' + col.green + Epoch + col.endcl)
  print()
+ print(col.bold + f'Nonce: ' + col.green + str(eta0) + col.endcl)
+ print()
  print(col.bold + f'Network Active Stake in Epoch ' + Epoch + ": " + col.green + str(nStake) + col.endcl + col.bold + ada + col.endcl)
  print()
  print(col.bold + f'Pool Active Stake in Epoch ' + Epoch + ": " + col.green + str(pStake) + col.endcl + col.bold + ada + col.endcl)
  print()
+
+
+if(key == 'C'):
+
+ headers = {'content-type': 'application/json', 'project_id': BlockFrostId}
+
+ epochParam = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/epochs/latest/parameters", headers=headers)
+ json_data = epochParam.json()
+ epoch = epochParam.json().get("epoch")
+ eta0 = epochParam.json().get("nonce")
+
+ netStakeParam = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/epochs/latest", headers=headers)
+ json_data = netStakeParam.json()
+ nStake = int(netStakeParam.json().get("active_stake")) / lovelaces
+ nStake = "{:,}".format(nStake)
+
+ poolStakeParam = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/pools/"+PoolId, headers=headers)
+ json_data = poolStakeParam.json()
+ pStake = int(poolStakeParam.json().get("active_stake")) / lovelaces
+ pStake = "{:,}".format(pStake)
+
+ poolSigma = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/pools/"+PoolId, headers=headers)
+ json_data = poolSigma.json()
+ sigma = poolSigma.json().get("active_size")
+ 
+ print()
+ print(col.bold + f'Checking SlotLeader Schedules for Stakepool: ' + (col.green + PoolTicker + col.endcl))
+ print()
+ print(col.bold + f'Pool Id: ' + (col.green + PoolId + col.endcl))
+ print()
+ print(col.bold + f'Epoch: ' + col.green + str(epoch) + col.endcl)
+ print()
+ print(col.bold + f'Nonce: ' + col.green + str(eta0) + col.endcl)
+ print()
+ print(col.bold + f'Network Active Stake in Epoch ' + str(epoch) + ": " + col.green + str(nStake) + col.endcl + col.bold + ada + col.endcl)
+ print()
+ print(col.bold + f'Pool Active Stake in Epoch ' + str(epoch) + ": " + col.green + str(pStake) + col.endcl + col.bold + ada + col.endcl)
+ print()
+
 
 
 ### Calculate Slots Leader ###
