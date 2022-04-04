@@ -27,7 +27,7 @@ local_tz = pytz.timezone('Europe/Berlin')
 BlockFrostId = ""
 PoolId = ""
 PoolTicker = ""
-VrfKeyFile = ('')
+VrfKeyFile = ('<path_to>/vrf.skey')
 ### -------------------------------------------------------------- ###
 
 
