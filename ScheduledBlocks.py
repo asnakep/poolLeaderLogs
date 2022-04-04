@@ -27,7 +27,7 @@ local_tz = pytz.timezone('Europe/Berlin')
 BlockFrostId = ""
 PoolId = ""
 PoolTicker = ""
-VrfKeyFile = ('<path_to>/vrf.skey')
+VrfKeyFile = ('')
 ### -------------------------------------------------------------- ###
 
 
@@ -76,10 +76,10 @@ print(col.endcl)
 ### Read Keyboard keys ###
 key = readchar.readkey()
 
-if(key == 'X'):
+if(key == 'X' or key =='x'):
  exit()
 
-if(key == 'N'):
+if(key == 'N' or key =='n'):
 
 ### Get data from Armada Alliance and Blockfrost.io ###
 
@@ -128,7 +128,7 @@ if(key == 'N'):
  print()
 
 
-if(key == 'P'):
+if(key == 'P' or key == 'p'):
 
  print()
  Epoch = input(col.bold + "Enter Epoch Previous Number: " + col.green)
@@ -175,7 +175,7 @@ if(key == 'P'):
  print()
 
 
-if(key == 'C'):
+if(key == 'C' or key == 'c'):
 
  headers = {'content-type': 'application/json', 'project_id': BlockFrostId}
 
