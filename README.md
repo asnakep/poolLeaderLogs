@@ -15,7 +15,7 @@ available on https://github.com/papacarp/pooltool.io.git
 
 ## Setup:
 - clone this repository using git: ``` git clone https://github.com/asnakep/ScheduledBlocks.git ```
-- execute inside the newly cloned directory: ```pip install -r requirements.txt   ```  to install all needed python package requirements
+- execute inside the newly cloned directory: ```pip install -r pip_requirements.txt   ```  to install all needed python package requirements
 - get a project id on blockfrost.io
 - make sure you can access your vrf.skey file (you can copy in it a path of your choice) and remember to keep it as read only ``` chmod 400 vrf.skey ```
 
