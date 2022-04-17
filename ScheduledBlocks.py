@@ -10,7 +10,7 @@ import hashlib
 import re
 import readchar
 from ctypes import *
-from os import path
+from os import system, path
 from datetime import datetime, timezone
 from sys import exit, platform
 
@@ -18,7 +18,10 @@ class col:
     red = '\033[31m'
     green = '\033[92m'
     endcl = '\033[0m'
-    bold = '\033[1m'
+
+def ClearScreen():
+    command ='clear'
+    system(command)
 
 ### Set your onw timezone -----------------------------------------###
 local_tz = pytz.timezone('Europe/Berlin')
@@ -41,12 +44,11 @@ CepochParam = requests.get("https://nonce.armada-alliance.io/current", headers=h
 json_data = CepochParam.json()
 Cepoch = CepochParam.json().get("epoch")
 
-### Get Current Epoch Nonce from Armada Alliance ###
+### Get Next Epoch Nonce from Armada Alliance ###
 NepochParam = requests.get("https://nonce.armada-alliance.io/next", headers=headers_armada)
 json_data = NepochParam.json()
 Nepoch = NepochParam.json().get("epoch")
 Neta0 = NepochParam.json().get("nonce")
-
 
 ErrorMsg = "Query returned no rows"
 if ErrorMsg in Neta0 :
@@ -55,33 +57,32 @@ if ErrorMsg in Neta0 :
 if ErrorMsg not in Neta0 :
  msg = str(col.green + f'(Next Epoch Nonce Available)')
 
+
 ### User Prompt for specific prev/curr Epochs
 print()
-print(col.bold + col.green + f'Welcome to ScheduledBlocks for Cardano SPOs. ')
+print(col.green + f'Welcome to ScheduledBlocks for Cardano SPOs. ')
 print()
 print(col.green + f'Check Assigned Blocks in Next, Current and Previous Cardano Epochs.')
 print(col.endcl)
-print(col.bold + col.green + f'Current Epoch: ' + col.endcl + col.bold +str(Cepoch))
+print(col.green + f'Current Epoch: ' + col.endcl +str(Cepoch))
 print(col.endcl)
-print()
-print(col.bold + f'(N) to check Next Epoch Schedules ' +str(msg))
+print(f'(n) to Check Next Epoch Schedules ' +str(msg))
 print(col.endcl)
-print(col.bold + f'(C) to Check Current Epoch')
+print(f'(c) to Check Current Epoch')
 print(col.endcl)
-print(col.bold + f'(P) to Check Previous Epochs')
+print(f'(p) to Check Previous Epochs')
 print(col.endcl)
-print(col.bold + f'(X) to Exit')
+print(f'(any key) to Exit')
 print(col.endcl)
 
 ### Read Keyboard keys ###
 key = readchar.readkey()
 
-if(key == 'X'):
- exit()
-
-if(key == 'N'):
+if(key == 'n'):
 
 ### Get data from Armada Alliance and Blockfrost.io ###
+
+ ClearScreen()
 
  headers = {'content-type': 'application/json', 'project_id': BlockFrostId}
  headers_armada ={'content-type': 'application/json'}
@@ -93,12 +94,12 @@ if(key == 'N'):
 
  ErrorMsg = "Query returned no rows"
  if ErrorMsg in eta0 :
-  print(col.bold + col.red + f'New Nonce Not Avaliable Yet for Epoch: '+ col.endcl + col.bold + str(epoch))
-  print(col.endcl)
+  print()
+  print(col.red + f'New Nonce Not Avaliable Yet for Epoch: '+ col.endcl + str(epoch))
   exit()
 
  if ErrorMsg not in eta0 :
-  print(col.bold + f'New Epoch Nonce: ' + col.green + str(eta0) + col.endcl)
+  print(f'New Epoch Nonce: ' + col.green + str(eta0) + col.endcl)
 
  netStakeParam = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/epochs/"+(str(epoch-1)), headers=headers)
  json_data = netStakeParam.json()
@@ -114,27 +115,27 @@ if(key == 'N'):
  json_data = poolSigma.json()
  sigma = poolSigma.json().get("active_size")
 
+ print()
+ print(f'Checking SlotLeader Schedules for Stakepool: ' + (col.green + PoolTicker + col.endcl))
+ print()
+ print(f'Pool Id: ' + (col.green + PoolId + col.endcl))
+ print()
+ print(f'Next Epoch: ' + col.green + str(epoch) + col.endcl)
+ print()
+ print(f'Network Active Stake in Epoch ' + str(epoch-1) + ": " + col.green + str(nStake) + col.endcl + ada + col.endcl)
+ print()
+ print(f'Pool Active Stake in Epoch ' + str(epoch-1) + ": " + col.green + str(pStake) + col.endcl + ada + col.endcl)
+ print()
 
- print()
- print(col.bold + f'Checking SlotLeader Schedules for Stakepool: ' + (col.green + PoolTicker + col.endcl))
- print()
- print(col.bold + f'Pool Id: ' + (col.green + PoolId + col.endcl))
- print()
- print(col.bold + f'Next Epoch: ' + col.green + str(epoch) + col.endcl)
- print()
- print(col.bold + f'Network Active Stake in Epoch ' + str(epoch-1) + ": " + col.green + str(nStake) + col.endcl + col.bold + ada + col.endcl)
- print()
- print(col.bold + f'Pool Active Stake in Epoch ' + str(epoch-1) + ": " + col.green + str(pStake) + col.endcl + col.bold + ada + col.endcl)
- print()
 
+if(key == 'p'):
 
-if(key == 'P'):
-
+ ClearScreen()
  print()
- Epoch = input(col.bold + "Enter Epoch Previous Number: " + col.green)
+ Epoch = input("Enter Epoch Previous Number: " + col.green)
  print(col.endcl)
 
-### Get data from blockfrost.io APIs ###
+ ### Get data from blockfrost.io APIs ###
 
  headers = {'content-type': 'application/json', 'project_id': BlockFrostId}
 
@@ -148,34 +149,34 @@ if(key == 'P'):
  nStake = int(netStakeParam.json().get("active_stake")) / lovelaces
  nStake = "{:,}".format(nStake)
 
- poolHistStake = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/pools/"+PoolId+"/history", headers=headers)
+ poolHistStake = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/pools/"+PoolId+"/history?page=1", headers=headers)
  json_data = poolHistStake.json()
 
  for i in json_data :
-  if i['epoch'] == int(Epoch) :
-   sigma = (i["active_size"])
+   if i['epoch'] == int(Epoch) :
+     sigma = (i["active_size"])
+     pStake = (i["active_stake"])
+     pStake = int(pStake) / lovelaces
+     pStake = "{:,}".format(pStake)
 
- for i in json_data :
-  if i['epoch'] == int(Epoch) :
-   pStake = (i["active_stake"])
-   pStake = int(pStake) / lovelaces
-   pStake = "{:,}".format(pStake)
 
- print(col.bold + f'Checking SlotLeader Schedules for Stakepool: ' + (col.green + PoolTicker + col.endcl))
+ print(f'Checking SlotLeader Schedules for Stakepool: ' + (col.green + PoolTicker + col.endcl))
  print()
- print(col.bold + f'Pool Id: ' + (col.green + PoolId + col.endcl))
+ print(f'Pool Id: ' + (col.green + PoolId + col.endcl))
  print()
- print(col.bold + f'Epoch: ' + col.green + Epoch + col.endcl)
+ print(f'Epoch: ' + col.green + Epoch + col.endcl)
  print()
- print(col.bold + f'Nonce: ' + col.green + str(eta0) + col.endcl)
+ print(f'Nonce: ' + col.green + str(eta0) + col.endcl)
  print()
- print(col.bold + f'Network Active Stake in Epoch ' + Epoch + ": " + col.green + str(nStake) + col.endcl + col.bold + ada + col.endcl)
+ print(f'Network Active Stake in Epoch ' + Epoch + ": " + col.green + str(nStake) + col.endcl + ada + col.endcl)
  print()
- print(col.bold + f'Pool Active Stake in Epoch ' + Epoch + ": " + col.green + str(pStake) + col.endcl + col.bold + ada + col.endcl)
+ print(f'Pool Active Stake in Epoch ' + Epoch + ": " + col.green + str(pStake) + col.endcl + ada + col.endcl)
  print()
 
 
-if(key == 'C'):
+if(key == 'c'):
+
+ ClearScreen()
 
  headers = {'content-type': 'application/json', 'project_id': BlockFrostId}
 
@@ -197,21 +198,25 @@ if(key == 'C'):
  poolSigma = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/pools/"+PoolId, headers=headers)
  json_data = poolSigma.json()
  sigma = poolSigma.json().get("active_size")
- 
+
  print()
- print(col.bold + f'Checking SlotLeader Schedules for Stakepool: ' + (col.green + PoolTicker + col.endcl))
+ print(f'Checking SlotLeader Schedules for Stakepool: ' + (col.green + PoolTicker + col.endcl))
  print()
- print(col.bold + f'Pool Id: ' + (col.green + PoolId + col.endcl))
+ print(f'Pool Id: ' + (col.green + PoolId + col.endcl))
  print()
- print(col.bold + f'Epoch: ' + col.green + str(epoch) + col.endcl)
+ print(f'Epoch: ' + col.green + str(epoch) + col.endcl)
  print()
- print(col.bold + f'Nonce: ' + col.green + str(eta0) + col.endcl)
+ print(f'Nonce: ' + col.green + str(eta0) + col.endcl)
  print()
- print(col.bold + f'Network Active Stake in Epoch ' + str(epoch) + ": " + col.green + str(nStake) + col.endcl + col.bold + ada + col.endcl)
+ print(f'Network Active Stake in Epoch ' + str(epoch) + ": " + col.green + str(nStake) + col.endcl + ada + col.endcl)
  print()
- print(col.bold + f'Pool Active Stake in Epoch ' + str(epoch) + ": " + col.green + str(pStake) + col.endcl + col.bold + ada + col.endcl)
+ print(f'Pool Active Stake in Epoch ' + str(epoch) + ": " + col.green + str(pStake) + col.endcl + ada + col.endcl)
  print()
 
+
+### ############### ###
+if(key != 'p') and (key != 'c') and (key != 'n'):
+ exit(0)
 
 
 ### Calculate Slots Leader ###
@@ -322,9 +327,13 @@ for slot in range(firstSlotOfEpoch,epochLength+firstSlotOfEpoch):
         timestamp = datetime.fromtimestamp(slot + 1591566291, tz=local_tz)
         slotcount+=1
 
-        print(col.bold + "Leader At Slot: "  + str(slot-firstSlotOfEpoch) + " - Local Time " + str(timestamp.strftime('%Y-%m-%d %H:%M:%S') + " - Scheduled Epoch Blocks: " + str(slotcount)))
+        print("Epoch: " + str(epoch) + " - Local Time: " + str(timestamp.strftime('%Y-%m-%d %H:%M:%S') + " - Slot: " + str(slot-firstSlotOfEpoch)))
+
+print()
+print("Total Scheduled Blocks: " + str(slotcount))
+
 
 if slotcount == 0:
-    print(col.bold + "No SlotLeader Schedules Found for Epoch " +str(epoch))
+    print()
+    print("No SlotLeader Schedules Found for Epoch: " +str(epoch))
     exit
-
