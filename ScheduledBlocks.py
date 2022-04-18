@@ -333,6 +333,25 @@ print()
 print("Total Scheduled Blocks: " + str(slotcount))
 
 
+### Epoch Assigned Performance or Luck ###
+
+blocksEpoch = 21600
+
+nStake = nStake.replace(',','')
+pStake = pStake.replace(',','')
+
+nStake = float(nStake)
+pStake = float(pStake)
+
+nStake = math.trunc(nStake)
+pStake = math.trunc(pStake)
+
+EpochLuck = int(100 * slotcount) / (blocksEpoch * pStake / nStake)
+
+print()
+print(f'Assigned Epoch Performance: ' + str(format(EpochLuck, ".2f")) + ' %' )
+
+
 if slotcount == 0:
     print()
     print("No SlotLeader Schedules Found for Epoch: " +str(epoch))
