@@ -99,6 +99,7 @@ if(key == 'n'):
   exit()
 
  if ErrorMsg not in eta0 :
+  print()
   print(f'New Epoch Nonce: ' + col.green + str(eta0) + col.endcl)
 
  netStakeParam = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/epochs/"+(str(epoch-1)), headers=headers)
