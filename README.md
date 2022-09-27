@@ -1,8 +1,8 @@
 # ScheduledBlocks
 Scheduled Block Checker for Cardano Stakepool Operators
 
-Lightweight and Portable Scheduled Blocks Checker for Next, Current and Previous Epochs.
-No cardano-node Required, data is taken from blockfrost.io and armada-alliance.com
+Lightweight and Portable Scheduled Blocks Checker for Current Epoch.
+No cardano-node Required, needed data is taken from blockfrost.io.
 
 Note: This is a reworking of old python script leaderLogs.py 
 available on https://github.com/papacarp/pooltool.io.git
