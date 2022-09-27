@@ -1,0 +1,22 @@
+After cloning the libsodium repo from github.com/input-output-hk
+
+git clone https://github.com/input-output-hk/libsodium.git
+
+please make sure you use the libsodium version used by cncli
+
+https://github.com/cardano-community/cncli/tree/develop/contrib
+
+where you can find the correct version:
+
+https://github.com/input-output-hk/libsodium/tree/66f017f16633f2060db25e17c170c2afa0f2a8a1
+
+git describe 66f017f16633f2060db25e17c170c2afa0f2a8a1
+
+> 1.0.16-519-g66f017f1
+
+git checkout 1.0.16-519-g66f017f1
+
+./autogen.sh
+./configure
+make
+sudo make install
