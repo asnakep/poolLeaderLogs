@@ -1,8 +1,9 @@
 # YaLL
 Yet Another Leader Logs for Cardano Stakepool Operators
 
-Lightweight and Portable Scheduled Blocks Checker for Current Epoch.
-No cardano-node Required, needed data is taken from blockfrost.io.
+Leader Logs Checker for Next, Current and Previuos Epochs.
+cardano-node is required for Next Epoch Nonce extraction, 
+rest of data is taken from blockfrost.io.
 
 Note: This is a reworking of old python script leaderLogs.py 
 available on https://github.com/papacarp/pooltool.io.git
