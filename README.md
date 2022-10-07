@@ -1,5 +1,5 @@
-# ScheduledBlocks
-Scheduled Block Checker for Cardano Stakepool Operators
+# YaLL
+Yet Another Leader Logs for Cardano Stakepool Operators
 
 Lightweight and Portable Scheduled Blocks Checker for Current Epoch.
 No cardano-node Required, needed data is taken from blockfrost.io.
