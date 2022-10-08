@@ -55,6 +55,19 @@ print(col.green + f'Check Leader Logs in Next, Current and Previous Cardano Epoc
 print(col.endcl)
 print(col.green + f'Current Epoch: ' + col.endcl +str(epoch))
 print(col.endcl)
+
+### newEpochNonce Availability ###
+latestBlocks = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/blocks/latest", headers=headers)
+json_data    = latestBlocks.json()
+epochSlot    = latestBlocks.json().get("epoch_slot")
+
+if epochSlot >= 302400:
+   epochNonce = print(col.green + f'New epochNonce Available'     + col.endcl)
+   print()
+if epochSlot <  302400:
+   epochNonce = print(col.red   + f'New epochNonce Not Available' + col.endcl)
+   print()
+
 print(f'(n) to Check Next Epoch Leader Logs')
 print(col.endcl)
 print(f'(c) to Check Current Epoch Leader Logs')
