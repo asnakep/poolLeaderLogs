@@ -31,7 +31,7 @@ local_tz = pytz.timezone('')
 
 ### Set These Variables ###
 BlockFrostId = ""
-PoolId       = "Hash Format, not bech32"
+PoolId       = "Pool Hash, not bech32"
 PoolTicker   = ""
 VrfKeyFile   = ('<your-path-to>/vrf.skey')
 ### -------------------------------------------------------------- ###
