@@ -1,8 +1,8 @@
 # YaLL
 Yet Another Leader Logs for Cardano Stakepool Operators
 
-Leader Logs Checker for Next, Current and Previuos Epochs.
-cardano-node is required for Next Epoch Nonce extraction.
+Leader Logs Checker for Next, Current and Previous Epochs.
+cardano-node is required for new epochNonce extraction.
 Rest of data is taken from blockfrost.io
 
 CARDANO_NODE_SOCKET_PATH is expected to be set in .bashrc
