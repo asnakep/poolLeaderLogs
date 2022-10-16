@@ -11,9 +11,9 @@ Note: This is a reworking of old python script leaderLogs.py
 available on https://github.com/papacarp/pooltool.io.git
 
 
-## 16/10/2022: Updated script with new Praos Math
-## Credits to https://github.com/QuixoteSystems
-## https://github.com/QuixoteSystems/cardano-leader-slot.git
+16/10/2022: Updated script with new Praos Math
+Credits to https://github.com/QuixoteSystems
+https://github.com/QuixoteSystems/cardano-leader-slot.git
 
 
 ## Prerequisites:
