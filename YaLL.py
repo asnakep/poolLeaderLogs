@@ -293,10 +293,6 @@ firstSlotOfEpoch = (firstSlot) + (epoch - 211)*epochLength
 # @param pool_vrf_skey The vrf signing key for the pool
 
 
-
-# Credits for new Praos Math to https://github.com/QuixoteSystems
-# From https://github.com/QuixoteSystems/cardano-leader-slot.git
-
 from decimal import *
 getcontext().prec = 9
 getcontext().rounding = ROUND_HALF_UP
