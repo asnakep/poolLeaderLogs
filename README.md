@@ -21,7 +21,7 @@ available on https://github.com/papacarp/pooltool.io.git
 - get a project id on blockfrost.io
 - make sure you can access your vrf.skey file (you can copy in it a path of your choice) and remember to keep it as read only ``` chmod 400 vrf.skey ```
 
-- Set Variables on lines 23, 27-30 of ScheduledBlocks.py:
+- Set Variables on lines 23, 27-30 of YaLL.py:
 
 ### Set your own timezone -----------------------------------------###
 local_tz = pytz.timezone('')
@@ -35,7 +35,7 @@ VrfKeyFile = ('')
 
 
 ## Usage:
-``` python3 ScheduledBlocks.py ```
+``` python3 YaLL.py ```
 
 ## Output: 
 - a *console output* with all the slots assigned for next, current and previous Epochs
