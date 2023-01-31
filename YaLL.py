@@ -34,28 +34,43 @@ def ClearScreen():
 ### Set your own timezone -----------------------------------------###
 local_tz = pytz.timezone('')
 
-### Eg: local_tz = pytz.timezone('Europe/Berlin')
+# Eg: local_tz = pytz.timezone('Europe/Berlin')
 
 
 ### Set These Variables ###
 BlockFrostId  = ""
 PoolId        = ""
 PoolIdBech    = ""
-PoolIdBechStr =  PoolIdBech+".json"
-PoolTicker    =  ""
+PoolIdBechStr = PoolIdBech+".json"
+PoolTicker    = ""
 VrfKeyFile    = ('<PATH>/vrf.skey')
 ### -------------------------------------------------------------- ###
 
 
-### Get Current Epoch Parameters from BlockFrost ###
-headers    = {'content-type': 'application/json', 'project_id': BlockFrostId}
-epochParam = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/epochs/latest/parameters", headers=headers)
-json_data  = epochParam.json()
-epoch      = epochParam.json().get("epoch")
+### BlockFrost Headers and URL ###
+headers       = {'content-type': 'application/json', 'project_id': BlockFrostId}
+BlockFrostUrl = "https://cardano-mainnet.blockfrost.io/api/v0/"
+
+
+### Get Current Current Epoch, Epoch Slot and Total Epoch Slots from BlockFrost ###
+epochParam        = requests.get(BlockFrostUrl+"epochs/latest/parameters", headers=headers)
+epochSlot         = requests.get(BlockFrostUrl+"blocks/latest", headers=headers)
+epochSlots        = requests.get(BlockFrostUrl+"genesis", headers=headers)
+json_data         = epochParam.json()
+epoch             = epochParam.json().get("epoch")
+json_data         = epochSlot.json()
+epochSlot         = epochSlot.json().get("epoch_slot")
+epochSlotFormat   = "{:,}".format(epochSlot)
+json_data         = epochSlots.json()
+epochSlots        = epochSlots.json().get("epoch_length")
+epochSlotsFormat  = "{:,}".format(epochSlots)
+remainingSlots    = epochSlots - epochSlot
+remainingSlots    = "{:,}".format(remainingSlots)
+
 
 
 ### Network Data from BlockFrost ###
-netStakeParam  = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/epochs/latest", headers=headers)
+netStakeParam  = requests.get(BlockFrostUrl+"epochs/latest", headers=headers)
 json_data      = netStakeParam.json()
 nStake         = netStakeParam.json().get("active_stake")
 nStakeToFormat = math.trunc(int(netStakeParam.json().get("active_stake")) / lovelaces)
@@ -63,7 +78,7 @@ nStakeFormat   = "{:,}".format(nStakeToFormat)
 
 
 ### Get Pool Stats BlockFrost ###
-poolStats       = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/pools/"+PoolId, headers=headers)
+poolStats       = requests.get(BlockFrostUrl+"pools/"+PoolId, headers=headers)
 json_data       = poolStats.json()
 
 poolPledge      = int(poolStats.json().get("declared_pledge")) / lovelaces
@@ -134,22 +149,21 @@ print(col.green + f'Check Scheduled Blocks in Next, Current and Previous Epochs.
 print(col.endcl)
 print(col.endcl)
 print(col.green + f'Current Cardano Epoch ' + col.endcl +str(epoch))
+print(col.green + f'Epoch Slot            ' + col.endcl +str(epochSlotFormat))
+print(col.green + f'Remaining Slots       ' + col.endcl +str(remainingSlots))
 print(col.endcl)
 print(col.green + f'Circulating Supply    ' + col.endcl +str(circSupplyFormat) +str(ada))
-print(col.endcl)
 print(col.green + f'Total Staked          ' + col.endcl +str(nStakeFormat)     +str(ada))
-print(col.endcl)
 print(col.green + f'Staked percent        ' + col.endcl +str(stakedPercent)    +str(percent))
 print(col.endcl)
 print(col.green + f'Stakepools            ' + col.endcl +str(stakePools))
-print(col.endcl)
 print(col.green + f'Delegators            ' + col.endcl +str(delegators))
 print(col.endcl)
 print(col.endcl)
 
 
 ### newEpochNonce Availability ###
-latestBlocks = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/blocks/latest", headers=headers)
+latestBlocks = requests.get(BlockFrostUrl+"blocks/latest", headers=headers)
 json_data    = latestBlocks.json()
 epochSlot    = latestBlocks.json().get("epoch_slot")
 
@@ -179,14 +193,12 @@ if(key == 'n'):
 
   ClearScreen()
 
-  headers      = {'content-type': 'application/json', 'project_id': BlockFrostId}
-
-  epochParam   = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/epochs/latest", headers=headers)
+  epochParam   = requests.get(BlockFrostUrl+"epochs/latest", headers=headers)
   json_data    = epochParam.json()
   epoch        = epochParam.json().get("epoch")
   epoch        = int(epoch + 1)
 
-  latestBlocks = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/blocks/latest", headers=headers)
+  latestBlocks = requests.get(BlockFrostUrl+"blocks/latest", headers=headers)
   json_data    = latestBlocks.json()
   epochSlot    = latestBlocks.json().get("epoch_slot")
 
@@ -205,7 +217,7 @@ if(key == 'n'):
     eta0 = hashlib.blake2b(bytes.fromhex(candidateNonce + lastEpochBlockNonce),digest_size=32).hexdigest()
 
     ### Get Pool Sigma from BlockFrost ###
-    poolSigma      = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/pools/"+PoolId, headers=headers)
+    poolSigma      = requests.get(BlockFrostUrl+"pools/"+PoolId, headers=headers)
     json_data      = poolSigma.json()
     sigma          = poolSigma.json().get("active_size")
 
@@ -258,15 +270,13 @@ if(key == 'c'):
   ClearScreen()
 
   ### Get Epoch Parametersfrom BlockFrost ###
-  headers        = {'content-type': 'application/json', 'project_id': BlockFrostId}
-
-  epochParam     = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/epochs/latest/parameters", headers=headers)
+  epochParam     = requests.get(BlockFrostUrl+"epochs/latest/parameters", headers=headers)
   json_data      = epochParam.json()
   epoch          = epochParam.json().get("epoch")
   eta0           = epochParam.json().get("nonce")
 
   ### Get Pool Sigma from BlockFrost ###
-  poolSigma      = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/pools/"+PoolId, headers=headers)
+  poolSigma      = requests.get(BlockFrostUrl+"pools/"+PoolId, headers=headers)
   json_data      = poolSigma.json()
   sigma          = poolSigma.json().get("active_size")
 
@@ -312,21 +322,18 @@ if(key == 'p'):
 
 
   ### Historical Network and Pool Data from BlockFrost ###
-
-  headers       = {'content-type': 'application/json', 'project_id': BlockFrostId}
-
-  epochParam    = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/epochs/"+Epoch+"/parameters", headers=headers)
+  epochParam    = requests.get(BlockFrostUrl+"epochs/"+Epoch+"/parameters", headers=headers)
   json_data     = epochParam.json()
   epoch         = epochParam.json().get("epoch")
   eta0          = epochParam.json().get("nonce")
 
-  netStakeParam = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/epochs/"+Epoch, headers=headers)
+  netStakeParam = requests.get(BlockFrostUrl+"epochs/"+Epoch, headers=headers)
   json_data     = netStakeParam.json()
   nStake        = int(netStakeParam.json().get("active_stake")) / lovelaces
   nStakeFormat  = math.trunc(nStake)
   nStakeFormat  = "{:,}".format(nStakeFormat)
 
-  poolHistStake = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/pools/"+PoolId+"/history?page=2", headers=headers)
+  poolHistStake = requests.get(BlockFrostUrl+"pools/"+PoolId+"/history?page=2", headers=headers)
   json_data     = poolHistStake.json()
 
   for i in json_data :
@@ -371,8 +378,7 @@ libsodium = cdll.LoadLibrary("/usr/local/lib/libsodium.so")
 libsodium.sodium_init()
 
 ### Blockchain Genesis Parameters ###
-headers          = {'content-type': 'application/json', 'project_id': BlockFrostId}
-GenesisParam     = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/genesis", headers=headers)
+GenesisParam     = requests.get(BlockFrostUrl+"genesis", headers=headers)
 json_data        = GenesisParam.json()
 
 epochLength      = GenesisParam.json().get("epoch_length")
@@ -380,13 +386,12 @@ activeSlotCoeff  = GenesisParam.json().get("active_slots_coefficient")
 slotLength       = GenesisParam.json().get("slot_length")
 
 ### Epoch211FirstSlot ###
-firstShelleySlot = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/blocks/4555184", headers=headers)
+firstShelleySlot = requests.get(BlockFrostUrl+"blocks/4555184", headers=headers)
 json_data        = firstShelleySlot.json()
 firstSlot        = firstShelleySlot.json().get("slot")
 
 ### calculate first slot of target epoch ###
 firstSlotOfEpoch = (firstSlot) + (epoch - 211)*epochLength
-
 
 
 # Determine if our pool is a slot leader for this given slot
@@ -506,7 +511,7 @@ if float(epoch) >= 364:
             timestamp = datetime.fromtimestamp(slot + 1591566291, tz=local_tz)
             slotcount+=1
 
-            print("Epoch: " + str(epoch) + " - Local Time: " + str(timestamp.strftime('%Y-%m-%d %H:%M:%S') + " - Slot: " + str(slot-firstSlotOfEpoch) + "  - Block: " + str(slotcount)))
+            print("Epoch: " + str(epoch) + " - Local Time: " + str(timestamp.strftime('%Y-%m-%d %H:%M:%S') + " - Absolute Slot: " + str(slot) + " - Epoch Slot: " + str(slot-firstSlotOfEpoch) + " - Block: " + str(slotcount)))
     print()
     print("Total Scheduled Blocks: " + str(slotcount))
 
@@ -555,7 +560,7 @@ else:
             pass
             timestamp = datetime.fromtimestamp(slot + 1591566291, tz=local_tz)
             slotcount+=1
-            print("Epoch: " + str(epoch) + " - Local Time: " + str(timestamp.strftime('%Y-%m-%d %H:%M:%S') + " - Slot: " + str(slot-firstSlotOfEpoch) + "  - Block: " + str(slotcount)))
+            print("Epoch: " + str(epoch) + " - Local Time: " + str(timestamp.strftime('%Y-%m-%d %H:%M:%S') + " - Absolute Slot: " + str(slot) + " - Epoch Slot: " + str(slot-firstSlotOfEpoch) + " - Block: " + str(slotcount)))
     print()
     print("Total Scheduled Blocks: " + str(slotcount))
 
