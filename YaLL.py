@@ -41,7 +41,6 @@ local_tz = pytz.timezone('')
 BlockFrostId  = ""
 PoolId        = ""
 PoolIdBech    = ""
-PoolIdBechStr = PoolIdBech+".json"
 PoolTicker    = ""
 VrfKeyFile    = ('<PATH>/vrf.skey')
 ### -------------------------------------------------------------- ###
@@ -105,6 +104,7 @@ poolActiveStake = "{:,}".format(poolActiveStake)
 
 
 ### Other Pool Stats from CExplorer.io
+PoolIdBechStr = PoolIdBech+".json"
 cexplorer_headers  = {'content-type': 'application/json'}
 poolUrl  = "https://js.cexplorer.io/api-static/pool/"+PoolIdBechStr
 request  = urllib.request.Request(poolUrl, headers=cexplorer_headers)
