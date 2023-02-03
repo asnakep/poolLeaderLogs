@@ -465,7 +465,7 @@ def get_performance(nStake, pStake):
     epoch_luck = int(100 * slotcount) / (blocksEpoch * pStake / nStake)
 
     print()
-    print(f'Assigned Epoch Performance: ' + str(format(epoch_luck, ".2f")) + ' %' )
+    print(f'Assigned Performance: ' + str(format(epoch_luck, ".2f")) + ' %' )
     print()
 
     if slotcount == 0:
@@ -511,7 +511,7 @@ if float(epoch) >= 364:
             timestamp = datetime.fromtimestamp(slot + 1591566291, tz=local_tz)
             slotcount+=1
 
-            print("Epoch: " + str(epoch) + " - Local Time: " + str(timestamp.strftime('%Y-%m-%d %H:%M:%S') + " - Absolute Slot: " + str(slot) + " - Epoch Slot: " + str(slot-firstSlotOfEpoch) + " - Block: " + str(slotcount)))
+            print("Epoch: " + str(epoch) + " - Local Time: " + str(timestamp.strftime('%Y-%m-%d %H:%M:%S') + " - Absolute Slot: " + str(slot) + " - Epoch Slot: " + str(slot-firstSlotOfEpoch)))
     print()
     print("Total Scheduled Blocks: " + str(slotcount))
 
@@ -560,7 +560,7 @@ else:
             pass
             timestamp = datetime.fromtimestamp(slot + 1591566291, tz=local_tz)
             slotcount+=1
-            print("Epoch: " + str(epoch) + " - Local Time: " + str(timestamp.strftime('%Y-%m-%d %H:%M:%S') + " - Absolute Slot: " + str(slot) + " - Epoch Slot: " + str(slot-firstSlotOfEpoch) + " - Block: " + str(slotcount)))
+            print("Epoch: " + str(epoch) + " - Local Time: " + str(timestamp.strftime('%Y-%m-%d %H:%M:%S') + " - Absolute Slot: " + str(slot) + " - Epoch Slot: " + str(slot-firstSlotOfEpoch)))
     print()
     print("Total Scheduled Blocks: " + str(slotcount))
 
