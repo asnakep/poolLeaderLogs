@@ -1,7 +1,7 @@
 # YaLL
 Yet Another Leader Logs for Cardano Stakepool Operators
 
-Leader Logs Checker for Next, Current and Previous Epochs. \ \
+Leader Logs Checker for Next, Current and Previous Epochs. \\
 All Needed Data is get from Koios APIs.
 
 Note: This is a reworking of old python script leaderLogs.py 
