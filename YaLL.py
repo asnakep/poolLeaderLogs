@@ -9,13 +9,12 @@ import pytz
 import hashlib
 import re
 import readchar
-import subprocess as sp
 from ctypes import *
 from os import system, path
 from datetime import datetime, timezone
 from sys import exit, platform
 
-### ADA Unicode symbol and Lovelaces removal ###
+### ADA Unicode symbol, Percent and Lovelaces  ###
 ada       = " \u20B3"
 lovelaces = 1000000
 percent   = " %"
@@ -32,113 +31,161 @@ def ClearScreen():
     system(command)
 
 ### Set your own timezone -----------------------------------------###
-local_tz = pytz.timezone('')
-
-# Eg: local_tz = pytz.timezone('Europe/Berlin')
-
+local_tz = pytz.timezone('Europe/Berlin')
 
 ### Set These Variables ###
-BlockFrostId  = ""
 PoolId        = ""
 PoolIdBech    = ""
 PoolTicker    = ""
-VrfKeyFile    = ('<PATH>/vrf.skey')
+VrfKeyFile    = '<PATH_TO>/vrf.skey'
+
+### Example
+# PoolId        = "342350284fd76ba9dbd7fd4ed579b2a2058d5ee558f8872b37817b28"
+# PoolIdBech    = "pool1xs34q2z06a46nk7hl48d27dj5gzc6hh9trugw2ehs9ajsevqffx"
+# PoolTicker    = "SNAKE"
+# VrfKeyFile    = '/home/user/cardano/vrf.skey'
 ### -------------------------------------------------------------- ###
 
+### Koios Headers and BaseURL ###
+koiosHeaders = {'content-type': 'application/json'}
+koiosBaseUrl = "https://api.koios.rest/api/v0/"
 
-### BlockFrost Headers and URL ###
-headers       = {'content-type': 'application/json', 'project_id': BlockFrostId}
-BlockFrostUrl = "https://cardano-mainnet.blockfrost.io/api/v0/"
+### Get Current Current Epoch, Epoch Slot and Total Epoch Slots ###
+koiosTipUrl        = koiosBaseUrl+"tip"
+request            = urllib.request.Request(koiosTipUrl, headers=koiosHeaders)
+response           = urllib.request.urlopen(request).read()
+tipData            = json.loads(response.decode('utf-8'))
+epoch              = int(tipData[0]['epoch_no'])
+epochSlot          = int(tipData[0]['epoch_slot'])
+epochSlotFormat    = "{:,}".format(epochSlot)
 
+### Genesis Info ###
+koiosGenesisUrl    = koiosBaseUrl+"genesis"
+request            = urllib.request.Request(koiosGenesisUrl, headers=koiosHeaders)
+response           = urllib.request.urlopen(request).read()
+genesisData        = json.loads(response.decode('utf-8'))
+epochLength        = int(genesisData[0]['epochlength'])
+slotLength         = int(genesisData[0]['slotlength'])
+remainingSlots     = epochLength - epochSlot
+remainingSlots     = "{:,}".format(remainingSlots)
 
-### Get Current Current Epoch, Epoch Slot and Total Epoch Slots from BlockFrost ###
-epochParam        = requests.get(BlockFrostUrl+"epochs/latest/parameters", headers=headers)
-epochSlot         = requests.get(BlockFrostUrl+"blocks/latest", headers=headers)
-epochSlots        = requests.get(BlockFrostUrl+"genesis", headers=headers)
-json_data         = epochParam.json()
-epoch             = epochParam.json().get("epoch")
-json_data         = epochSlot.json()
-epochSlot         = epochSlot.json().get("epoch_slot")
-epochSlotFormat   = "{:,}".format(epochSlot)
-json_data         = epochSlots.json()
-epochSlots        = epochSlots.json().get("epoch_length")
-epochSlotsFormat  = "{:,}".format(epochSlots)
-remainingSlots    = epochSlots - epochSlot
-remainingSlots    = "{:,}".format(remainingSlots)
+### Network Active Stake ###
+koiosEpochInfoUrl  = koiosBaseUrl+"epoch_info?_epoch_no="+str(epoch)
+request            = urllib.request.Request(koiosEpochInfoUrl, headers=koiosHeaders)
+response           = urllib.request.urlopen(request).read()
+epochInfoData      = json.loads(response.decode('utf-8'))
+nStake             = int(epochInfoData[0]['active_stake'])
+nStakeToFormat     = math.trunc(int(nStake) / lovelaces)
+nStakeFormat       = "{:,}".format(nStakeToFormat)
+nStakePerf         = nStakeFormat
 
+### Current Epoch Nonce from ###
+koiosEpochParamUrl = koiosBaseUrl+"epoch_params?_epoch_no="+str(epoch)
+request            = urllib.request.Request(koiosEpochParamUrl, headers=koiosHeaders)
+response           = urllib.request.urlopen(request).read()
+epochParamData     = json.loads(response.decode('utf-8'))
+eta0               = epochParamData[0]['nonce']
 
+### Get Pool Stats from ###
+poolInfoUrl        = koiosBaseUrl+"pool_info"
+poolPostData       = {"_pool_bech32_ids":[PoolIdBech]}
 
-### Network Data from BlockFrost ###
-netStakeParam  = requests.get(BlockFrostUrl+"epochs/latest", headers=headers)
-json_data      = netStakeParam.json()
-nStake         = netStakeParam.json().get("active_stake")
-nStakeToFormat = math.trunc(int(netStakeParam.json().get("active_stake")) / lovelaces)
-nStakeFormat   = "{:,}".format(nStakeToFormat)
+poolinfo           = requests.post(poolInfoUrl, data=json.dumps(poolPostData))
+poolinfo           = poolinfo.text
+poolinfo           = json.loads(poolinfo)
 
+poolPledge         = int(poolinfo[0]['pledge']) / lovelaces
+poolPledge         = math.trunc(poolPledge)
+poolPledge         = "{:,}".format(poolPledge)
 
-### Get Pool Stats BlockFrost ###
-poolStats       = requests.get(BlockFrostUrl+"pools/"+PoolId, headers=headers)
-json_data       = poolStats.json()
+poolMargin         = poolinfo[0]['margin']
 
-poolPledge      = int(poolStats.json().get("declared_pledge")) / lovelaces
-poolPledge      = math.trunc(poolPledge)
-poolPledge      = "{:,}".format(poolPledge)
+poolFixedCost      = int(poolinfo[0]['fixed_cost']) / lovelaces
+poolFixedCost      = math.trunc(poolFixedCost)
 
-poolMargin      = poolStats.json().get("margin_cost")
-poolFixedCost   = int(poolStats.json().get("fixed_cost")) / lovelaces
-poolFixedCost   = math.trunc(poolFixedCost)
+poolDelegators     = poolinfo[0]['live_delegators']
 
-poolDelegators  = poolStats.json().get("live_delegators")
-blocksLifetime  = poolStats.json().get("blocks_minted")
+blocksLifetime     = poolinfo[0]['block_count']
 
-poolSaturation  = poolStats.json().get("live_saturation") * 100
-poolSaturation  = round(poolSaturation,2)
+poolSaturation     = poolinfo[0]['live_saturation']
 
-poolLiveStake   = int(poolStats.json().get("live_stake")) / lovelaces
-poolLiveStake   = math.trunc(poolLiveStake)
-poolLiveStake   = "{:,}".format(poolLiveStake)
+poolLiveStake      = int(poolinfo[0]['live_stake']) / lovelaces
+poolLiveStake      = math.trunc(poolLiveStake)
+poolLiveStake      = "{:,}".format(poolLiveStake)
 
-pStake          = int(poolStats.json().get("active_stake")) / lovelaces
-poolActiveStake = math.trunc(pStake)
-poolActiveStake = "{:,}".format(poolActiveStake)
+pStake             = int(poolinfo[0]['active_stake']) / lovelaces
+poolActiveStake    = math.trunc(pStake)
+poolActiveStake    = "{:,}".format(poolActiveStake)
 
+pStakePerf         = poolActiveStake
 
-### Other Pool Stats from CExplorer.io
-PoolIdBechStr = PoolIdBech+".json"
+sigma              = poolinfo[0]['sigma']
+
+### Get Other Pool Stats from cexplorer.io ###
+PoolIdBechStr      =  PoolIdBech+".json"
 cexplorer_headers  = {'content-type': 'application/json'}
-poolUrl  = "https://js.cexplorer.io/api-static/pool/"+PoolIdBechStr
-request  = urllib.request.Request(poolUrl, headers=cexplorer_headers)
-response = urllib.request.urlopen(request).read()
-poolDat  = json.loads(response.decode('utf-8'))
+poolUrl            = "https://js.cexplorer.io/api-static/pool/"+PoolIdBechStr
+request            = urllib.request.Request(poolUrl, headers=cexplorer_headers)
+response           = urllib.request.urlopen(request).read()
+poolDat            = json.loads(response.decode('utf-8'))
 
-blocksEstimated = float(poolDat['data']['blocks_est_epoch'])
-blocksEstimated = math.trunc(blocksEstimated)
-luckLifetime    = float(poolDat['data']['luck_lifetime']) * 100
-luckLifetime    = round(luckLifetime,2)
-roaShort        = float(poolDat['data']['roa_short'])
-roaShort        = round(roaShort, 1)
-roaLifetime     = (poolDat['data']['roa_lifetime'])
-poolRanking     = (poolDat['data']['position'])
+luckLifetime       = float(poolDat['data']['luck_lifetime']) * 100
+luckLifetime       = round(luckLifetime,2)
+roaShort           = float(poolDat['data']['roa_short'])
+roaShort           = round(roaShort, 1)
+roaLifetime        = (poolDat['data']['roa_lifetime'])
+poolRanking        = (poolDat['data']['position'])
 
+### Get Global Cardano Stats from cexplorer.io ###
+statsUrl           = "https://js.cexplorer.io/api-static/basic/global.json"
+request            = urllib.request.Request(statsUrl, headers=cexplorer_headers)
+response           = urllib.request.urlopen(request).read()
+statsDat           = json.loads(response.decode('utf-8'))
 
-### Get Global Cardano Stats from CExplorer.io
-statsUrl = "https://js.cexplorer.io/api-static/basic/global.json"
-request  = urllib.request.Request(statsUrl, headers=cexplorer_headers)
-response = urllib.request.urlopen(request).read()
-statsDat = json.loads(response.decode('utf-8'))
+circSupply         = int(statsDat['data']['supply']['now'] / lovelaces)
+circSupplyFormat   = "{:,}".format(circSupply)
 
-circSupply       = int(statsDat['data']['supply']['now'] / lovelaces)
-circSupplyFormat = "{:,}".format(circSupply)
+stakePools         = int(statsDat['data']['stats']['pools'])
+stakePools         = "{:,}".format(stakePools)
 
-stakePools = int(statsDat['data']['stats']['pools'])
-stakePools = "{:,}".format(stakePools)
+delegators         = int(statsDat['data']['stats']['delegators'])
+delegators         = "{:,}".format(delegators)
 
-delegators = int(statsDat['data']['stats']['delegators'])
-delegators = "{:,}".format(delegators)
+stakedPercent      = (nStakeToFormat * 100 / circSupply)
+stakedPercent      = str(round(stakedPercent, 2))
 
-stakedPercent = (nStakeToFormat * 100 / circSupply)
-stakedPercent = str(round(stakedPercent, 2))
+### Next Epoch Nonce, Next Pool Sigma and Next Pool Active Stake from ###
+koiosPoolSnapshotUrl      = koiosBaseUrl+"pool_stake_snapshot?_pool_bech32="+PoolIdBech
+request                   = urllib.request.Request(koiosPoolSnapshotUrl, headers=koiosHeaders)
+response                  = urllib.request.urlopen(request).read()
+poolStakeSnapData         = json.loads(response.decode('utf-8'))
+nextEpochNonce            = (poolStakeSnapData[2]['nonce'])
+nextPoolActiveStake       = (poolStakeSnapData[2]['pool_stake'])
+nextPoolActiveStakeFormat = int(nextPoolActiveStake) / lovelaces
+nextPoolActiveStakeFormat = math.trunc(nextPoolActiveStakeFormat)
+nextPoolActiveStakeFormat = "{:,}".format(nextPoolActiveStakeFormat)
+pStakePerf                = nextPoolActiveStakeFormat
 
+nextNetActiveStake        = (poolStakeSnapData[2]['active_stake'])
+nextNetActiveStakeFormat  = int(nextNetActiveStake) / lovelaces
+nextNetActiveStakeFormat  = math.trunc(nextNetActiveStakeFormat)
+nextNetActiveStakeFormat  = "{:,}".format(nextNetActiveStakeFormat)
+nStakePerf                = nextNetActiveStakeFormat
+nextPoolSigma             = int(nextPoolActiveStake) / int(nextNetActiveStake)
+
+### Pool Estimated Blocks from Koios ###
+koiosGenesisUrl           = koiosBaseUrl+"genesis"
+request                   = urllib.request.Request(koiosGenesisUrl, headers=koiosHeaders)
+response                  = urllib.request.urlopen(request).read()
+networkGenesisData        = json.loads(response.decode('utf-8'))
+epochlength               = int(networkGenesisData[0]['epochlength'])
+activeSlotCoeff           = float(networkGenesisData[0]['activeslotcoeff'])
+blocksInEpoch             = math.trunc(epochlength * activeSlotCoeff)
+
+nextPoolActiveInt         = int(nextPoolActiveStake) / lovelaces
+nextNetActiveInt          = int(nextNetActiveStake) / lovelaces
+blocksEstimated           = int(blocksInEpoch * nextPoolActiveInt) / (nextNetActiveInt)
+blocksEstimated           = round(blocksEstimated,2)
 
 ### User Prompt ###
 ClearScreen()
@@ -161,12 +208,7 @@ print(col.green + f'Delegators            ' + col.endcl +str(delegators))
 print(col.endcl)
 print(col.endcl)
 
-
 ### newEpochNonce Availability ###
-latestBlocks = requests.get(BlockFrostUrl+"blocks/latest", headers=headers)
-json_data    = latestBlocks.json()
-epochSlot    = latestBlocks.json().get("epoch_slot")
-
 if epochSlot >= 302400:
    epochNonce = print(col.green + f'New epochNonce Available'     + col.endcl)
    print()
@@ -182,79 +224,54 @@ print(f'(p) to Check Previous Epochs Leader Logs')
 print(col.endcl)
 print(f'(any other key) to Exit')
 
-
 ### Read Keyboard keys ###
 key = readchar.readkey()
 
 if(key == 'n'):
 
-### Extract newEpochNonce from cardano-node ###
-### Get Current Epoch and Current epoch_slot from BlockFrost ###
-
   ClearScreen()
-
-  epochParam   = requests.get(BlockFrostUrl+"epochs/latest", headers=headers)
-  json_data    = epochParam.json()
-  epoch        = epochParam.json().get("epoch")
-  epoch        = int(epoch + 1)
-
-  latestBlocks = requests.get(BlockFrostUrl+"blocks/latest", headers=headers)
-  json_data    = latestBlocks.json()
-  epochSlot    = latestBlocks.json().get("epoch_slot")
-
+  epoch         = int(epoch + 1)
 
   ### Check Next Epoch Leader Logs ###
 
   if epochSlot >= 302400:
 
-    ### Take "candidateNonce" from protocol-state ###
-    candidateNonce      = sp.getoutput('cardano-cli query protocol-state --mainnet | jq -r .candidateNonce.contents')
-
-    ### Take "lastEpochBlockNonce" from protocol-state ###
-    lastEpochBlockNonce = sp.getoutput("cardano-cli query protocol-state --mainnet | jq -r .lastEpochBlockNonce.contents")
-
-    ### Extract newEpochNonce ###
-    eta0 = hashlib.blake2b(bytes.fromhex(candidateNonce + lastEpochBlockNonce),digest_size=32).hexdigest()
-
-    ### Get Pool Sigma from BlockFrost ###
-    poolSigma      = requests.get(BlockFrostUrl+"pools/"+PoolId, headers=headers)
-    json_data      = poolSigma.json()
-    sigma          = poolSigma.json().get("active_size")
-
+    eta0   = nextEpochNonce
+    sigma  = nextPoolSigma
 
     ### Message ###
     print()
-    print(f'Checking Leader Logs for Stakepool: ' + (col.green + PoolTicker + col.endcl))
+    print(f'Checking Leader Logs for Stakepool: ' + (col.green + PoolTicker                 + col.endcl))
     print()
-    print(f'Pool Id: '                            + (col.green + PoolId     + col.endcl))
+    print(f'Pool Id: '                            + (col.green + PoolId                     + col.endcl))
     print()
-    print(f' Live Stake:       '  + (col.green + poolLiveStake              + col.endcl) + ada)
-    print(f' Active Stake:     '  + (col.green + poolActiveStake            + col.endcl) + ada)
-    print(f' Pledge:           '  + (col.green + poolPledge                 + col.endcl) + ada)
-    print(f' Pool Margin:      '  + (col.green + str(poolMargin)            + col.endcl) + percent)
-    print(f' Pool FixedCost:   '  + (col.green + str(poolFixedCost)         + col.endcl) + ada)
-    print(f' Delegators:       '  + (col.green + str(poolDelegators)        + col.endcl))
-    print(f' Estimated Blocks: '  + (col.green + str(blocksEstimated)       + col.endcl))
-    print(f' Lifetime Blocks:  '  + (col.green + str(blocksLifetime)        + col.endcl))
-    print(f' Lifetime Luck:    '  + (col.green + str(luckLifetime)          + col.endcl) + percent)
-    print(f' Last Roa:         '  + (col.green + str(roaShort) + col.endcl) + percent)
-    print(f' Lifetime Roa:     '  + (col.green + roaLifetime + col.endcl)   + percent)
-    print(f' Saturation:       '  + (col.green + str(poolSaturation)        + col.endcl) + percent)
-    print(f' Rank:             '  + (col.green + poolRanking                + col.endcl))
+    print(f' Live Stake:       '                  + (col.green + poolLiveStake              + col.endcl) + ada)
+    print(f' Active Stake:     '                  + (col.green + nextPoolActiveStakeFormat  + col.endcl) + ada)
+    print(f' Pledge:           '                  + (col.green + poolPledge                 + col.endcl) + ada)
+    print(f' Pool Margin:      '                  + (col.green + str(poolMargin)            + col.endcl) + percent)
+    print(f' Pool FixedCost:   '                  + (col.green + str(poolFixedCost)         + col.endcl) + ada)
+    print(f' Delegators:       '                  + (col.green + str(poolDelegators)        + col.endcl))
+    print(f' Estimated Blocks: '                  + (col.green + str(blocksEstimated)       + col.endcl))
+    print(f' Lifetime Blocks:  '                  + (col.green + str(blocksLifetime)        + col.endcl))
+    print(f' Lifetime Luck:    '                  + (col.green + str(luckLifetime)          + col.endcl) + percent)
+    print(f' Last Roa:         '                  + (col.green + str(roaShort) + col.endcl) + percent)
+    print(f' Lifetime Roa:     '                  + (col.green + roaLifetime + col.endcl)   + percent)
+    print(f' Saturation:       '                  + (col.green + str(poolSaturation)        + col.endcl) + percent)
+    print(f' Rank:             '                  + (col.green + poolRanking                + col.endcl))
     print()
-    print(f'Next Epoch: '                    + col.green + str(epoch) + col.endcl)
+    print(f'Next Epoch: '                         + col.green + str(epoch)                  + col.endcl)
     print()
-    print(f'Nonce: '                         + col.green + str(eta0)  + col.endcl)
+    print(f'Nonce: '                              + col.green + str(eta0)                   + col.endcl)
     print()
-    print(f'Network Active Stake in Epoch '  + str(epoch) + ": " + col.green + str(nStakeFormat)    + col.endcl + ada + col.endcl)
+    print(f'Network Active Stake in Epoch '       + str(epoch) + ": " + col.green + str(nextNetActiveStakeFormat)  + col.endcl + ada + col.endcl)
     print()
-    print(f'Pool Active Stake in Epoch '     + str(epoch) + ": " + col.green + str(poolActiveStake) + col.endcl + ada + col.endcl)
+    print(f'Pool Active Stake in Epoch '          + str(epoch) + ": " + col.green + str(nextPoolActiveStakeFormat) + col.endcl + ada + col.endcl)
     print()
 
 
   if epochSlot < 302400:
     print()
-    print(f'New epochNonce Not Yet Computable for Epoch: ' + str(epoch))
+    print(f'New epochNonce Not Yet Available for Epoch: ' + str(epoch))
     print()
     print(f'Please come back at epochSlot 302400.')
     print()
@@ -262,54 +279,40 @@ if(key == 'n'):
     print()
     exit()
 
-
 ### Check Current Epoch Leader Logs ###
 
 if(key == 'c'):
 
   ClearScreen()
 
-  ### Get Epoch Parametersfrom BlockFrost ###
-  epochParam     = requests.get(BlockFrostUrl+"epochs/latest/parameters", headers=headers)
-  json_data      = epochParam.json()
-  epoch          = epochParam.json().get("epoch")
-  eta0           = epochParam.json().get("nonce")
-
-  ### Get Pool Sigma from BlockFrost ###
-  poolSigma      = requests.get(BlockFrostUrl+"pools/"+PoolId, headers=headers)
-  json_data      = poolSigma.json()
-  sigma          = poolSigma.json().get("active_size")
-
-
   ### Message ###
   print()
   print(f'Checking Leader Logs for Stakepool: ' + (col.green + PoolTicker + col.endcl))
   print()
-  print(f'Pool Id: ' + (col.green + PoolId + col.endcl))
+  print(f'Pool Id: '                            + (col.green + PoolId + col.endcl))
   print()
-  print(f' Live Stake:       '  + (col.green + poolLiveStake              + col.endcl) + ada)
-  print(f' Active Stake:     '  + (col.green + poolActiveStake            + col.endcl) + ada)
-  print(f' Pledge:           '  + (col.green + poolPledge                 + col.endcl) + ada)
-  print(f' Pool Margin:      '  + (col.green + str(poolMargin)            + col.endcl) + percent)
-  print(f' Pool FixedCost:   '  + (col.green + str(poolFixedCost)         + col.endcl) + ada)
-  print(f' Estimated Blocks: '  + (col.green + str(blocksEstimated)       + col.endcl))
-  print(f' Delegators:       '  + (col.green + str(poolDelegators)        + col.endcl))
-  print(f' Lifetime Blocks:  '  + (col.green + str(blocksLifetime)        + col.endcl))
-  print(f' Lifetime Luck:    '  + (col.green + str(luckLifetime)          + col.endcl) + percent)
-  print(f' Last Roa:         '  + (col.green + str(roaShort) + col.endcl) + percent)
-  print(f' Lifetime Roa:     '  + (col.green + roaLifetime + col.endcl)   + percent)
-  print(f' Saturation:       '  + (col.green + str(poolSaturation)        + col.endcl) + percent)
-  print(f' Rank:             '  + (col.green + poolRanking                + col.endcl))
+  print(f' Live Stake:       '                  + (col.green + poolLiveStake              + col.endcl) + ada)
+  print(f' Active Stake:     '                  + (col.green + poolActiveStake            + col.endcl) + ada)
+  print(f' Pledge:           '                  + (col.green + poolPledge                 + col.endcl) + ada)
+  print(f' Pool Margin:      '                  + (col.green + str(poolMargin)            + col.endcl) + percent)
+  print(f' Pool FixedCost:   '                  + (col.green + str(poolFixedCost)         + col.endcl) + ada)
+  print(f' Estimated Blocks: '                  + (col.green + str(blocksEstimated)       + col.endcl))
+  print(f' Delegators:       '                  + (col.green + str(poolDelegators)        + col.endcl))
+  print(f' Lifetime Blocks:  '                  + (col.green + str(blocksLifetime)        + col.endcl))
+  print(f' Lifetime Luck:    '                  + (col.green + str(luckLifetime)          + col.endcl) + percent)
+  print(f' Last Roa:         '                  + (col.green + str(roaShort) + col.endcl) + percent)
+  print(f' Lifetime Roa:     '                  + (col.green + roaLifetime + col.endcl)   + percent)
+  print(f' Saturation:       '                  + (col.green + str(poolSaturation)        + col.endcl) + percent)
+  print(f' Rank:             '                  + (col.green + poolRanking                + col.endcl))
   print()
-  print(f'Epoch: '                         + col.green + str(epoch) + col.endcl)
+  print(f'Epoch: '                              + col.green + str(epoch)                  + col.endcl)
   print()
-  print(f'Nonce: '                         + col.green + str(eta0) + col.endcl)
+  print(f'Nonce: '                              + col.green + str(eta0)                   + col.endcl)
   print()
-  print(f'Network Active Stake in Epoch '  + str(epoch) + ": " + col.green + str(nStakeFormat)    + col.endcl + ada + col.endcl)
+  print(f'Network Active Stake in Epoch '       + str(epoch) + ": " + col.green + str(nStakeFormat)    + col.endcl + ada + col.endcl)
   print()
-  print(f'Pool Active Stake in Epoch '     + str(epoch) + ": " + col.green + str(poolActiveStake) + col.endcl + ada + col.endcl)
+  print(f'Pool Active Stake in Epoch '          + str(epoch) + ": " + col.green + str(poolActiveStake) + col.endcl + ada + col.endcl)
   print()
-
 
 ### Check Previous Epochs Leader Logs ###
 
@@ -322,53 +325,54 @@ if(key == 'p'):
 
 
   ### Historical Network and Pool Data from BlockFrost ###
-  epochParam    = requests.get(BlockFrostUrl+"epochs/"+Epoch+"/parameters", headers=headers)
-  json_data     = epochParam.json()
-  epoch         = epochParam.json().get("epoch")
-  eta0          = epochParam.json().get("nonce")
+  histEpochParamsUrl    = koiosBaseUrl+"epoch_params?_epoch_no="+Epoch
+  request               = urllib.request.Request(histEpochParamsUrl, headers=koiosHeaders)
+  response              = urllib.request.urlopen(request).read()
+  histEpochParamsData   = json.loads(response.decode('utf-8'))
+  epoch                 = histEpochParamsData[0]['epoch_no']
+  eta0                  = histEpochParamsData[0]['nonce']
 
-  netStakeParam = requests.get(BlockFrostUrl+"epochs/"+Epoch, headers=headers)
-  json_data     = netStakeParam.json()
-  nStake        = int(netStakeParam.json().get("active_stake")) / lovelaces
-  nStakeFormat  = math.trunc(nStake)
-  nStakeFormat  = "{:,}".format(nStakeFormat)
+  histNetEpochInfoUrl   = koiosBaseUrl+"epoch_info?_epoch_no="+Epoch
+  request               = urllib.request.Request(histNetEpochInfoUrl, headers=koiosHeaders)
+  response              = urllib.request.urlopen(request).read()
+  histNetEpochInfoData  = json.loads(response.decode('utf-8'))
+  nStake                = int(histNetEpochInfoData[0]['active_stake']) / lovelaces
+  nStakeFormat          = math.trunc(nStake)
+  nStakeFormat          = "{:,}".format(nStakeFormat)
+  nStakePerf            = nStakeFormat
 
-  poolHistStake = requests.get(BlockFrostUrl+"pools/"+PoolId+"/history?page=2", headers=headers)
-  json_data     = poolHistStake.json()
-
-  for i in json_data :
-      if i['epoch'] == int(Epoch) :
-          sigma           = (i["active_size"])
-          pStake          = (i["active_stake"])
-          pStake          = int(pStake) / lovelaces
-          pStake          = math.trunc(pStake)
-          poolActiveStake = "{:,}".format(pStake)
+  histPoolEpochInfoUrl  = koiosBaseUrl+"pool_history?_pool_bech32="+PoolIdBech+"&_epoch_no="+Epoch
+  request               = urllib.request.Request(histPoolEpochInfoUrl, headers=koiosHeaders)
+  response              = urllib.request.urlopen(request).read()
+  histPoolEpochInfoData = json.loads(response.decode('utf-8'))
+  pStake                = int(histPoolEpochInfoData[0]['active_stake']) / lovelaces
+  poolActiveStake       = math.trunc(pStake)
+  poolActiveStake       = "{:,}".format(poolActiveStake)
+  pStakePerf            = poolActiveStake
+  sigma                 = pStake / nStake
 
 
   ### Message ###
   print(f'Checking Leader Logs for Stakepool: ' + (col.green + PoolTicker + col.endcl))
   print()
-  print(f'Pool Id: ' + (col.green + PoolId      + col.endcl))
+  print(f'Pool Id: '                            + (col.green + PoolId      + col.endcl))
   print()
-  print(f'Epoch: '   + col.green  + Epoch       + col.endcl)
+  print(f'Epoch: '                              + col.green  + Epoch       + col.endcl)
   print()
-  print(f'Nonce: '   + col.green  + str(eta0)   + col.endcl)
+  print(f'Nonce: '                              + col.green  + str(eta0)   + col.endcl)
   print()
-  print(f'Network Active Stake in Epoch ' + Epoch + ": " + col.green + str(nStakeFormat)    + col.endcl + ada + col.endcl)
+  print(f'Network Active Stake in Epoch '       + Epoch + ": " + col.green + str(nStakeFormat)    + col.endcl + ada + col.endcl)
   print()
-  print(f'Pool Active Stake in Epoch '    + Epoch + ": " + col.green + str(poolActiveStake) + col.endcl + ada + col.endcl)
+  print(f'Pool Active Stake in Epoch '          + Epoch + ": " + col.green + str(poolActiveStake) + col.endcl + ada + col.endcl)
   print()
-
 
 ### ######################################### ###
 if(key != 'n') and (key != 'c') and (key != 'p'):
    ClearScreen()
    exit(0)
 
-
-### Leader Logs Computation ###
-
-### Opening vrf.skey file ####
+### Leader Logs Computation: ###
+### Opening vrf.skey file   ####
 with open(VrfKeyFile) as f:
         skey = json.load(f)
         pool_vrf_skey = skey['cborHex'][4:]
@@ -377,18 +381,14 @@ with open(VrfKeyFile) as f:
 libsodium = cdll.LoadLibrary("/usr/local/lib/libsodium.so")
 libsodium.sodium_init()
 
-### Blockchain Genesis Parameters ###
-GenesisParam     = requests.get(BlockFrostUrl+"genesis", headers=headers)
-json_data        = GenesisParam.json()
-
-epochLength      = GenesisParam.json().get("epoch_length")
-activeSlotCoeff  = GenesisParam.json().get("active_slots_coefficient")
-slotLength       = GenesisParam.json().get("slot_length")
-
 ### Epoch211FirstSlot ###
-firstShelleySlot = requests.get(BlockFrostUrl+"blocks/4555184", headers=headers)
-json_data        = firstShelleySlot.json()
-firstSlot        = firstShelleySlot.json().get("slot")
+firstShelleyBlockHash = "33a28456a44277cbfb3457082467e56f16554932eb2a9eb7ceca97740bd4f4db"
+blockInfoUrl          = koiosBaseUrl+"block_info"
+postData              = {"_block_hashes":[firstShelleyBlockHash]}
+blockInfo             = requests.post(blockInfoUrl, data=json.dumps(postData))
+blockInfo             = blockInfo.text
+blockInfo             = json.loads(blockInfo)
+firstSlot             = blockInfo[0]['abs_slot']
 
 ### calculate first slot of target epoch ###
 firstSlotOfEpoch = (firstSlot) + (epoch - 211)*epochLength
@@ -401,11 +401,9 @@ firstSlotOfEpoch = (firstSlot) + (epoch - 211)*epochLength
 # @param eta0 The epoch nonce value
 # @param pool_vrf_skey The vrf signing key for the pool
 
-
 from decimal import *
 getcontext().prec = 9
 getcontext().rounding = ROUND_HALF_UP
-
 
 def mk_seed(slot, eta0):
     h = hashlib.blake2b(digest_size=32)
@@ -413,7 +411,6 @@ def mk_seed(slot, eta0):
     slotToSeedBytes = h.digest()
 
     return slotToSeedBytes
-
 
 def vrf_eval_certified(seed, praosCanBeLeaderSignKeyVRF):
     if isinstance(seed, bytes) and isinstance(praosCanBeLeaderSignKeyVRF, bytes):
@@ -427,7 +424,6 @@ def vrf_eval_certified(seed, praosCanBeLeaderSignKeyVRF):
         print("Error.  Feed me bytes")
         exit()
 
-
 def vrf_leader_value(vrfCert):
     h = hashlib.blake2b(digest_size=32)
     h.update(str.encode("L"))
@@ -435,7 +431,6 @@ def vrf_leader_value(vrfCert):
     vrfLeaderValueBytes = h.digest()
 
     return int.from_bytes(vrfLeaderValueBytes, byteorder="big", signed=False)
-
 
 def isOverlaySlot(firstSlotOfEpoch, currentSlot, decentralizationParam):
     diff_slot = float(currentSlot - firstSlotOfEpoch)
@@ -445,27 +440,24 @@ def isOverlaySlot(firstSlotOfEpoch, currentSlot, decentralizationParam):
         return True
     return False
 
-
 ### Epoch Assigned Performance or Luck ###
-def get_performance(nStake, pStake):
+def get_performance(nStakePerf, pStakePerf):
+
     blocksEpoch = 21600
 
-    nStake = nStakeFormat
-    pStake = poolActiveStake
+    nStakePerf = nStakePerf.replace(',','')
+    pStakePerf = pStakePerf.replace(',','')
 
-    nStake = nStake.replace(',','')
-    pStake = pStake.replace(',','')
+    nStakePerf = float(nStakePerf)
+    pStakePerf = float(pStakePerf)
 
-    nStake = float(nStake)
-    pStake = float(pStake)
+    nStakePerf = math.trunc(nStakePerf)
+    pStakePerf = math.trunc(pStakePerf)
 
-    nStake = math.trunc(nStake)
-    pStake = math.trunc(pStake)
-
-    epoch_luck = int(100 * slotcount) / (blocksEpoch * pStake / nStake)
+    epoch_luck = int(100 * slotcount) / (blocksEpoch * pStakePerf / nStakePerf)
 
     print()
-    print(f'Assigned Performance: ' + str(format(epoch_luck, ".2f")) + ' %' )
+    print(f'Assigned Performance: ' + str(format(epoch_luck, ".0f")) + ' %' )
     print()
 
     if slotcount == 0:
@@ -473,7 +465,6 @@ def get_performance(nStake, pStake):
         print("No SlotLeader Schedules Found for Epoch: " +str(epoch))
         print()
         exit
-
 
 ### For Epochs inside Praos Time ###
 if float(epoch) >= 364:
@@ -515,8 +506,7 @@ if float(epoch) >= 364:
     print()
     print("Total Scheduled Blocks: " + str(slotcount))
 
-    get_performance(nStake, pStake)
-
+    get_performance(nStakePerf, pStakePerf)
 
 ### For old Epochs inside TPraos Time (before Current Ouroboros Praos) ###
 else:
@@ -564,4 +554,4 @@ else:
     print()
     print("Total Scheduled Blocks: " + str(slotcount))
 
-    get_performance(nStake, pStake)
+    get_performance(nStakePerf, pStakePerf)
