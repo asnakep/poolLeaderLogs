@@ -2,10 +2,7 @@
 Yet Another Leader Logs for Cardano Stakepool Operators
 
 Leader Logs Checker for Next, Current and Previous Epochs.
-cardano-node is required for new epochNonce extraction.
-Rest of data is taken from blockfrost.io
-
-CARDANO_NODE_SOCKET_PATH is expected to be set in .bashrc
+All Needed Data is get from Koios APIs.
 
 Note: This is a reworking of old python script leaderLogs.py 
 available on https://github.com/papacarp/pooltool.io.git
@@ -18,7 +15,6 @@ available on https://github.com/papacarp/pooltool.io.git
 ## Setup:
 - clone this repository using git: ``` git clone https://github.com/asnakep/YaLL.git ```
 - execute inside the newly cloned directory: ```pip install -r pip_requirements.txt   ```  to install all needed python package requirements
-- get a project id on blockfrost.io
 - make sure you can access your vrf.skey file (you can copy in it a path of your choice) and remember to keep it as read only ``` chmod 400 vrf.skey ```
 
 - Set Variables on lines 30, 33-36 of YaLL.py:
@@ -27,8 +23,8 @@ available on https://github.com/papacarp/pooltool.io.git
 local_tz = pytz.timezone('')
 
 ### Set These Variables ###
-BlockFrostId = ""
 PoolId = ""
+PoolIdBech = ""
 PoolTicker = ""
 VrfKeyFile = ('')
 ### -------------------------------------------------------------- ###
