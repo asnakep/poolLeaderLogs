@@ -159,7 +159,7 @@ koiosPoolSnapshotUrl      = koiosBaseUrl+"pool_stake_snapshot?_pool_bech32="+Poo
 request                   = urllib.request.Request(koiosPoolSnapshotUrl, headers=koiosHeaders)
 response                  = urllib.request.urlopen(request).read()
 poolStakeSnapData         = json.loads(response.decode('utf-8'))
-nextEpochNonce            = (poolStakeSnapData[2]['nonce'])
+nextEpochNonce            = str(poolStakeSnapData[2]['nonce'])
 nextPoolActiveStake       = (poolStakeSnapData[2]['pool_stake'])
 nextPoolActiveStakeFormat = int(nextPoolActiveStake) / lovelaces
 nextPoolActiveStakeFormat = math.trunc(nextPoolActiveStakeFormat)
