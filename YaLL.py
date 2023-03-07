@@ -29,6 +29,12 @@ class col:
 def ClearScreen():
     command ='clear'
     system(command)
+    
+### Loading Data Message ###
+ClearScreen()
+print()
+print(col.green + f'Loading Data from Koios...')
+print()
 
 ### Set your own timezone -----------------------------------------###
 local_tz = pytz.timezone('Europe/Berlin')
