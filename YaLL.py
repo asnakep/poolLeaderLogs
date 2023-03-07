@@ -19,17 +19,17 @@ ada       = " \u20B3"
 lovelaces = 1000000
 percent   = " %"
 
-### Def Colors
+### Def Colors ###
 class col:
     red = '\033[31m'
     green = '\033[92m'
     endcl = '\033[0m'
 
-### Clear Screen
+### Clear Screen ###
 def ClearScreen():
     command ='clear'
     system(command)
-    
+
 ### Loading Data Message ###
 ClearScreen()
 print()
@@ -46,12 +46,12 @@ PoolIdBech    = ""
 PoolTicker    = ""
 VrfKeyFile    = '<PATH_TO>/vrf.skey'
 
-### Example
+### Example:
 # PoolId        = "342350284fd76ba9dbd7fd4ed579b2a2058d5ee558f8872b37817b28"
 # PoolIdBech    = "pool1xs34q2z06a46nk7hl48d27dj5gzc6hh9trugw2ehs9ajsevqffx"
 # PoolTicker    = "SNAKE"
 # VrfKeyFile    = '/home/user/cardano/vrf.skey'
-### -------------------------------------------------------------- ###
+
 
 ### Koios Headers and BaseURL ###
 koiosHeaders = {'content-type': 'application/json'}
@@ -143,7 +143,7 @@ roaShort           = round(roaShort, 1)
 roaLifetime        = (poolDat['data']['roa_lifetime'])
 poolRanking        = (poolDat['data']['position'])
 
-### Get Global Cardano Stats from cexplorer.io ###
+### Global Cardano Stats from cexplorer.io ###
 statsUrl           = "https://js.cexplorer.io/api-static/basic/global.json"
 request            = urllib.request.Request(statsUrl, headers=cexplorer_headers)
 response           = urllib.request.urlopen(request).read()
@@ -240,7 +240,6 @@ if(key == 'n'):
   epoch         = int(epoch + 1)
 
   ### Check Next Epoch Leader Logs ###
-
   if epochSlot >= 302400:
 
     eta0   = nextEpochNonce
