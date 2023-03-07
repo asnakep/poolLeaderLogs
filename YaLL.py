@@ -79,14 +79,14 @@ nStakeToFormat     = math.trunc(int(nStake) / lovelaces)
 nStakeFormat       = "{:,}".format(nStakeToFormat)
 nStakePerf         = nStakeFormat
 
-### Current Epoch Nonce from ###
+### Current Epoch Nonce from Koios ###
 koiosEpochParamUrl = koiosBaseUrl+"epoch_params?_epoch_no="+str(epoch)
 request            = urllib.request.Request(koiosEpochParamUrl, headers=koiosHeaders)
 response           = urllib.request.urlopen(request).read()
 epochParamData     = json.loads(response.decode('utf-8'))
 eta0               = epochParamData[0]['nonce']
 
-### Get Pool Stats from ###
+### Get Pool Stats from Koios ###
 poolInfoUrl        = koiosBaseUrl+"pool_info"
 poolPostData       = {"_pool_bech32_ids":[PoolIdBech]}
 
@@ -154,7 +154,7 @@ delegators         = "{:,}".format(delegators)
 stakedPercent      = (nStakeToFormat * 100 / circSupply)
 stakedPercent      = str(round(stakedPercent, 2))
 
-### Next Epoch Nonce, Next Pool Sigma and Next Pool Active Stake from ###
+### Next Epoch Nonce, Next Pool Sigma and Next Pool Active Stake from Koios ###
 koiosPoolSnapshotUrl      = koiosBaseUrl+"pool_stake_snapshot?_pool_bech32="+PoolIdBech
 request                   = urllib.request.Request(koiosPoolSnapshotUrl, headers=koiosHeaders)
 response                  = urllib.request.urlopen(request).read()
@@ -324,7 +324,7 @@ if(key == 'p'):
   print(col.endcl)
 
 
-  ### Historical Network and Pool Data from BlockFrost ###
+  ### Historical Network and Pool Data from Koios ###
   histEpochParamsUrl    = koiosBaseUrl+"epoch_params?_epoch_no="+Epoch
   request               = urllib.request.Request(histEpochParamsUrl, headers=koiosHeaders)
   response              = urllib.request.urlopen(request).read()
