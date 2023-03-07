@@ -37,7 +37,8 @@ print(col.green + f'Loading Data from Koios...')
 print()
 
 ### Set your own timezone -----------------------------------------###
-local_tz = pytz.timezone('Europe/Berlin')
+### Example: local_tz = pytz.timezone('Europe/Berlin')             ###
+local_tz = pytz.timezone('/')
 
 ### Set These Variables ###
 PoolId        = ""
