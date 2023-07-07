@@ -130,7 +130,7 @@ sigma              = poolinfo[0]['sigma']
 
 ### Other Pool Stats from cexplorer.io ###
 PoolIdBechStr      =  PoolIdBech+".json"
-cexplorer_headers  = {'content-type': 'application/json'}
+cexplorer_headers  = {'content-type': 'application/json', 'User-Agent': 'Mozilla/5.0'}
 poolUrl            = "https://js.cexplorer.io/api-static/pool/"+PoolIdBechStr
 request            = urllib.request.Request(poolUrl, headers=cexplorer_headers)
 response           = urllib.request.urlopen(request).read()
