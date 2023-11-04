@@ -1,11 +1,11 @@
 
-Clone libsodium from https://github.com/input-output-hk/libsodium/tree/66f017f16633f2060db25e17c170c2afa0f2a8a1
+Clone libsodium from https://github.com/input-output-hk/libsodium/
 
 git clone https://github.com/input-output-hk/libsodium.git
 
 cd libsodium
 
-git checkout 1.0.16-519-g66f017f1
+ensure you're in the branch iquerejeta/vrf_batchverify with git branch
 
 ./autogen.sh
 ./configure
