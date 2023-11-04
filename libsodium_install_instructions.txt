@@ -1,5 +1,5 @@
 
-Clone libsodium from github.com/input-output-hk
+Clone libsodium from https://github.com/input-output-hk/libsodium/tree/66f017f16633f2060db25e17c170c2afa0f2a8a1
 
 git clone https://github.com/input-output-hk/libsodium.git
 
