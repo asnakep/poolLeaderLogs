@@ -35,7 +35,7 @@ VrfKeyFile = ('')
 <br/><br/>
 ## Usage:
 <br/><br/>
-``` python3 poolLeaderLogs_koios.py ```
+``` python3 poolLeaderLogs.py ```
 <br/><br/>
 ## Output:
 <br/><br/>
