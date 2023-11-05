@@ -23,21 +23,21 @@ available on https://github.com/papacarp/pooltool.io.git
 <br/><br/>
 - Set Variables on lines 41-47 of poolLeaderLogs.py:
 <br/><br/>
-please see the example in poolLeaderLogs.py
-<br/><br/>
 ### Set your own timezone ###
 <br/><br/>
 local_tz = pytz.timezone('')
 <br/><br/>
 ### Set These Variables ###
 <br/><br/>
-PoolId     = ""
+PoolId
 <br/>
-PoolIdBech = ""
+PoolIdBech
 <br/>
-PoolTicker = ""
+PoolTicker
 <br/>
-VrfKeyFile = ""
+VrfKeyFile
+<br/><br/>
+please see the example in poolLeaderLogs.py
 <br/><br/>
 ## Usage:
 <br/><br/>
