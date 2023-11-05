@@ -23,13 +23,13 @@ available on https://github.com/papacarp/pooltool.io.git
 <br/><br/>
 ### Set Variables on lines 41-47 of poolLeaderLogs.py ###
 <br/><br/>
-### Set your own timezone ###
+### Your own timezone ###
 <br/><br/>
 Example: 
 <br/>
 local_tz = pytz.timezone('Europe/Berlin')  
 <br/><br/>
-### Set These Variables ###
+### poolId, poolTicker, vrf.skey Variables ###
 <br/><br/>
 Example:
 <br/>
