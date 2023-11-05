@@ -1,8 +1,6 @@
 # poolLeaderLogs
 <br/><br/>
-Leader Logs Checker for Cardano SPOs
-<br/><br/>
-Leader Logs Checker for Next, Current and Previous Epochs.
+SPO Leader Logs Checker for Next, Current and Previous Epochs.
 <br/><br/>
 All Needed Data is get from Koios APIs.
 <br/><br/>
