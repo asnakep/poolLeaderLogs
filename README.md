@@ -28,7 +28,7 @@ available on https://github.com/papacarp/pooltool.io.git
 Example: 
 <br/>
 local_tz = pytz.timezone('Europe/Berlin')  
-<br/>
+<br/><br/>
 ### Variables for poolId, poolTicker, vrf.skey
 <br/>
 Example:
