@@ -21,23 +21,25 @@ available on https://github.com/papacarp/pooltool.io.git
 <br/><br/>
 - make sure you can access your vrf.skey file (you can copy in it a path of your choice) and remember to keep it as read only ``` chmod 400 vrf.skey ```
 <br/><br/>
-- Set Variables on lines 41-47 of poolLeaderLogs.py:
+### Set Variables on lines 41-47 of poolLeaderLogs.py ###
 <br/><br/>
 ### Set your own timezone ###
 <br/><br/>
-local_tz = pytz.timezone('')
+Example: 
+<br/>
+local_tz = pytz.timezone('Europe/Berlin')  
 <br/><br/>
 ### Set These Variables ###
 <br/><br/>
-PoolId
+Example:
 <br/>
-PoolIdBech
+PoolId        = "342350284fd76ba9dbd7fd4ed579b2a2058d5ee558f8872b37817b28"
 <br/>
-PoolTicker
+PoolIdBech    = "pool1xs34q2z06a46nk7hl48d27dj5gzc6hh9trugw2ehs9ajsevqffx"
 <br/>
-VrfKeyFile
-<br/><br/>
-please see the example in poolLeaderLogs.py
+PoolTicker    = "SNAKE"
+<br/>
+VrfKeyFile    = '/home/user/cardano/vrf.skey'
 <br/><br/>
 ## Usage:
 <br/><br/>
