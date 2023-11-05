@@ -23,14 +23,20 @@ available on https://github.com/papacarp/pooltool.io.git
 <br/><br/>
 - Set Variables on lines 41-47 of poolLeaderLogs_koios.py:
 <br/><br/>
-### Set your own timezone -----------------------------------------###
+### Set your own timezone ###
+<br/><br/>
 local_tz = pytz.timezone('')
 <br/><br/>
 ### Set These Variables ###
+<br/><br/>
 PoolId = ""
+<br/><br/>
 PoolIdBech = ""
+<br/><br/>
 PoolTicker = ""
+<br/><br/>
 VrfKeyFile = ('')
+<br/><br/>
 ### -------------------------------------------------------------- ###
 <br/><br/>
 ## Usage:
