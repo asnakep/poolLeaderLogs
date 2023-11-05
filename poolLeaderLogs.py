@@ -378,6 +378,14 @@ if(key != 'n') and (key != 'c') and (key != 'p'):
    exit(0)
 
 ### Leader Logs Computation: ###
+
+# https://github.com/papacarp/pooltool.io/blob/master/leaderLogs/leaderLogs.py
+# leader logs proof of concept - all credit goes to
+# @andrewwestberg of BCSH,
+# @AC8998 (Antonio) of CSP
+# @iiLap (Pal Dorogi) of UNDR
+# for the algo extraction from cardano-node
+
 ### Opening vrf.skey file   ####
 with open(VrfKeyFile) as f:
         skey = json.load(f)
