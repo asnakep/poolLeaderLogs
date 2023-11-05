@@ -21,7 +21,7 @@ available on https://github.com/papacarp/pooltool.io.git
 <br/><br/>
 - make sure you can access your vrf.skey file (you can copy in it a path of your choice) and remember to keep it as read only ``` chmod 400 vrf.skey ```
 <br/><br/>
-- Set Variables on lines 37-40 of poolLeaderLogs_koios.py:
+- Set Variables on lines 41-47 of poolLeaderLogs_koios.py:
 <br/><br/>
 ### Set your own timezone -----------------------------------------###
 local_tz = pytz.timezone('')
