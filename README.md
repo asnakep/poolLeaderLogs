@@ -29,12 +29,12 @@ local_tz = pytz.timezone('')
 <br/><br/>
 ### Set These Variables ###
 <br/><br/>
-PoolId = ""
-<br/><br/>
+PoolId     = ""
+<br/>
 PoolIdBech = ""
 <br/>
 PoolTicker = ""
-<br/><br/>
+<br/>
 VrfKeyFile = ('')
 <br/><br/>
 ## Usage:
