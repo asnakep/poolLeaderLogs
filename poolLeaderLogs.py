@@ -197,7 +197,7 @@ blocksEstimated           = round(blocksEstimated,2)
 ### User Prompt ###
 ClearScreen()
 print()
-print(col.green + f'Yet Another Leader Logs for Cardano SPOs. ')
+print(col.green + f'Leader Logs Checker for Cardano SPOs. ')
 print()
 print(col.green + f'Check Scheduled Blocks in Next, Current and Previous Epochs.')
 print(col.endcl)
