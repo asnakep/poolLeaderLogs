@@ -14,7 +14,7 @@ available on https://github.com/papacarp/pooltool.io.git
 <br/><br/>
 
 ## Setup:
-<br/><br/>
+<br/>
 - clone this repository using git: ``` git clone https://github.com/asnakep/poolLeaderLogs.git ```
 <br/><br/>
 - execute inside the newly cloned directory: ```pip install -r pip_requirements.txt   ```  to install all needed python package requirements
