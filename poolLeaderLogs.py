@@ -468,7 +468,7 @@ def get_performance(nStakePerf, pStakePerf):
     nStakePerf = math.trunc(nStakePerf)
     pStakePerf = math.trunc(pStakePerf)
 
-    epoch_luck = int(100 * slotcount) / (blocksEpoch * pStakePerf / nStakePerf)
+    epoch_luck = int(1000 * slotcount) / (blocksEpoch * pStakePerf / nStakePerf)
 
     print()
     print(f'Assigned Luck: ' + str(format(epoch_luck, ".0f")) + ' %' )
