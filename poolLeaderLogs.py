@@ -560,6 +560,10 @@ else:
     slotcount=0
     for slot in range(firstSlotOfEpoch,epochLength+firstSlotOfEpoch):
         slotLeader = isSlotLeader(slot, activeSlotCoeff, sigma, eta0, pool_vrf_skey)
+        
+        ### End Current Epoch Leader Logs Computation ###
+        #################################################
+        
         if slotLeader:
             pass
             timestamp = datetime.fromtimestamp(slot + 1591566291, tz=local_tz)
