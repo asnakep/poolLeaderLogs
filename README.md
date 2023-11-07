@@ -8,8 +8,11 @@ Note: This is a reworking of old python script leaderLogs.py
 available on https://github.com/papacarp/pooltool.io.git
 <br/><br/>
 ## Prerequisites:
+<br/>
 - Python 3.8
+<br/>
 - pip (Python package installer)
+<br/>
 - libsodium library
 <br/><br/>
 
