@@ -9,11 +9,11 @@ available on https://github.com/papacarp/pooltool.io.git
 <br/><br/>
 **Prerequisites:**
 <br/>
-- Python 3.8
+Python 3.8
 <br/>
-- pip (Python package installer)
+pip (Python package installer)
 <br/>
-- libsodium library
+libsodium library
 <br/><br/>
 
 ## Setup:
