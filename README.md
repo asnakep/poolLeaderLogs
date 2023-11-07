@@ -44,11 +44,11 @@ PoolTicker    = "SNAKE"
 <br/>
 VrfKeyFile    = '/home/user/cardano/vrf.skey'
 <br/><br/>
-**Usage:**
+# Usage:
 <br/><br/>
 python3 poolLeaderLogs.py
 <br/><br/>
-**Output:**
+# Output:
 <br/><br/>
 - a *console output* with all the slots assigned for next, current and previous Epochs
 <br/><br/>
