@@ -20,9 +20,9 @@ libsodium library
 <br/>
 - clone this repository using git: "git clone https://github.com/asnakep/poolLeaderLogs.git"
 <br/><br/>
-- execute inside the newly cloned directory: "pip install -r pip_requirements.txt" to install all needed python package requirements
+- execute inside the newly cloned directory: "pip install -r pip_requirements.txt" to install all needed python package requirements.
 <br/><br/>
-- make sure you can access your vrf.skey file (you can copy in it a path of your choice) and remember to keep it as read only ``` chmod 400 vrf.skey ```
+- make sure you can access your vrf.skey file (you can copy in it a path of your choice) and remember to keep it as read only "chmod 400 vrf.skey"
 <br/><br/>
 ### Set Variables on lines 42 and 45-48 of poolLeaderLogs.py
 <br/>
