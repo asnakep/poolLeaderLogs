@@ -26,7 +26,7 @@ Make sure you can access your vrf.skey file (you can copy in it a path of your c
 <br/><br/>
 ### Set Variables on lines 42 and 45-48 of poolLeaderLogs.py
 <br/>
-### Your own timezone
+### Indicate your own timezone
 <br/>
 Example: 
 <br/>
