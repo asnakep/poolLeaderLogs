@@ -226,7 +226,11 @@ if(key == 'n'):
   epoch         = int(epoch + 1)
 
   ### Check Next Epoch Leader Logs ###
-  if epochSlot >= 302400:
+  ### Koios new epoch nonce available at 09:50am UTC on fourth epoch day.
+  ### 36 hours before epoch end.
+  ### from https://api.koios.rest/api/v1/pool_stake_snapshot
+  ### we update "epochSlot >= 302400:" to epochSlot >= 302700:
+  if epochSlot >= 302700:
 
     eta0   = nextEpochNonce
     sigma  = nextPoolSigma
@@ -258,11 +262,11 @@ if(key == 'n'):
     print()
 
 
-  if epochSlot < 302400:
+  if epochSlot < 302700:
     print()
     print(f'New epochNonce Not Yet Available for Epoch: ' + str(epoch))
     print()
-    print(f'Please come back at epochSlot 302400.')
+    print(f'Please come back at epochSlot 302700.')
     print()
     print(f'Current epochSlot '+ str(epochSlot) + '.')
     print()
