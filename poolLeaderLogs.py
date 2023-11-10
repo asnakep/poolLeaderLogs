@@ -230,7 +230,9 @@ if(key == 'n'):
 
     eta0   = nextEpochNonce
     sigma  = nextPoolSigma
-
+    pStake = nextPoolActiveStake
+    nStake = nextNetActiveStake
+    
     ### Message ###
     print()
     print(f'Checking Leader Logs for Stakepool: ' + (col.green + PoolTicker                 + col.endcl))
