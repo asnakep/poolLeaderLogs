@@ -234,8 +234,8 @@ if(key == 'n'):
 
     eta0   = nextEpochNonce
     sigma  = nextPoolSigma
-    pStake = nextPoolActiveStake
-    nStake = nextNetActiveStake
+    pStake = int(nextPoolActiveStake)
+    nStake = int(nextNetActiveStake)
     
     ### Message ###
     print()
