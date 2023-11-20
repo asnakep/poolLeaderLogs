@@ -53,6 +53,10 @@ VrfKeyFile    = '<PATH_TO>/vrf.skey'
 # PoolTicker    = "SNAKE"
 # VrfKeyFile    = '/home/user/cardano/vrf.skey'
 
+### Koios Headers and BaseURL ###
+# Uncomment this and comment koiosHeaders on line 62 if you use Koios Auth Token
+# koiosToken = "yourKoiosAuthToken"
+# koiosHeaders = { 'Accept': 'application/json', 'Authorization': f'Bearer {koiosToken}' }
 
 ### Koios Headers and BaseURL ###
 koiosHeaders = {'content-type': 'application/json'}
